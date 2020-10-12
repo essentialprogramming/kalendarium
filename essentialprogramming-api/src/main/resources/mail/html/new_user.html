@@ -1,0 +1,46 @@
+<div th:fragment="new_user" xmlns:th="http://www.thymeleaf.org">
+    <p><h4 th:text="#{new_user.header.text}"></h4></p>
+    <br/>
+
+    <!--/*@thymesVar id="fullName" type="java.lang.String"*/-->
+    <strong th:text="${fullName}"></strong>
+    <br/>
+    <br/>
+    <span th:text="#{new_user.thankyou}"></span>
+    <br/>
+    <br/>
+    <div style="
+    text-align: center;">
+
+        <!--/*@thymesVar id="confirmationLink" type="java.lang.String"*/-->
+        <a href="#" th:href="${confirmationLink}" th:text="#{new_user.confirmaccount}" target="_other" rel="nofollow"
+           style="
+    background: #ef8860;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 5px;
+    "></a>
+    </div>
+
+    
+
+    <br/>
+    <br/>
+
+    <span th:text="#{new_user.aftersuccessful}"></span>
+    <div style="margin-left:35px;">
+        <br/>
+        <span th:text="#{new_user.list.generate.qr}"></span>
+        <br/>
+        <br/>
+        <span th:text="#{new_user.list.invite.employees}"></span>
+        <br/>
+        <br/>
+        <span th:text="#{new_user.list.download.extract}"></span>
+    </div>
+    <br/>
+    <br/>
+    <span th:text="#{new_user.regards}"></span>
+</div>
