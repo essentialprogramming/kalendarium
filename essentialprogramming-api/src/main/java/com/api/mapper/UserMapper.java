@@ -9,7 +9,7 @@ public class UserMapper {
 
     public static User inputToUser(UserInput input) {
         return User.builder()
-                .username(input.getUserName())
+                .username(input.getEmail())
                 .firstName(input.getFirstName())
                 .lastName(input.getLastName())
                 .email(input.getEmail())

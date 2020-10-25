@@ -12,58 +12,58 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "user")
-@javax.persistence.Table(name = "User")
+@javax.persistence.Table(name = "user", schema = "public")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "UserId", nullable = false, unique = true)
+    @Column(name = "userid", nullable = false, unique = true)
     private int id;
 
-    @Column(name = "UserName")
+    @Column(name = "username")
     private String username;
 
-    @Column(name = "FirstName")
+    @Column(name = "firstname")
     private String firstName;
 
-    @Column(name = "LastName")
+    @Column(name = "lastname")
     private String lastName;
 
-    @Column(name = "Email")
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "Phone")
+    @Column(name = "phone")
     private String phone;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DefaultLanguageId")
+    @JoinColumn(name = "defaultlanguageid")
     private Language language;
 
-    @Column(name = "Validated")
+    @Column(name = "validated")
     private boolean validated;
 
-    @Column(name = "UserKey")
+    @Column(name = "userkey")
     private String userKey;
 
-    @Column(name = "ModifiedDate")
+    @Column(name = "modifieddate")
     private LocalDateTime modifiedDate;
 
-    @Column(name = "Active")
+    @Column(name = "active")
     private boolean active;
 
-    @Column(name = "Deleted")
+    @Column(name = "deleted")
     private boolean deleted;
 
-    @Column(name = "CreatedDate")
+    @Column(name = "createddate")
     private LocalDateTime cratedDate;
 
-    @Column(name = "ModifiedBy")
+    @Column(name = "modifiedby")
     private Integer modifiedBy;
 
-    @Column(name = "CreatedBy")
+    @Column(name = "createdby")
     private Integer createdBy;
 
-    @Column(name = "Password")
+    @Column(name = "password")
     private String password;
 
 

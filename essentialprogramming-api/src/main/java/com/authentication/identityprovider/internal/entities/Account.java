@@ -1,8 +1,10 @@
 package com.authentication.identityprovider.internal.entities;
 
 
+import com.api.entities.Language;
 import lombok.*;
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,43 +15,58 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "account")
-@Table(name = "User")
+@Table(name = "user", schema = "public")
 public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "UserId", nullable = false, unique = true)
+    @Column(name = "userid", nullable = false, unique = true)
     private int id;
 
-    @Column(name = "UserName")
+    @Column(name = "username")
     private String username;
 
-    @Column(name = "FirstName")
+    @Column(name = "firstname")
     private String firstName;
 
-    @Column(name = "LastName")
+    @Column(name = "lastname")
     private String lastName;
 
-    @Column(name = "Email")
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "Phone")
+    @Column(name = "phone")
     private String phone;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "defaultlanguageid")
+    private Language language;
 
-    @Column(name = "Validated")
+    @Column(name = "validated")
     private boolean validated;
 
-    @Column(name = "Active")
-    private boolean active;
-
-    @Column(name = "Deleted")
-    private boolean deleted;
-
-    @Column(name = "UserKey")
+    @Column(name = "userkey")
     private String userKey;
 
-    @Column(name = "Password")
+    @Column(name = "modifieddate")
+    private LocalDateTime modifiedDate;
+
+    @Column(name = "active")
+    private boolean active;
+
+    @Column(name = "deleted")
+    private boolean deleted;
+
+    @Column(name = "createddate")
+    private LocalDateTime cratedDate;
+
+    @Column(name = "modifiedby")
+    private Integer modifiedBy;
+
+    @Column(name = "createdby")
+    private Integer createdBy;
+
+    @Column(name = "password")
     private String password;
 
 

@@ -14,11 +14,10 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInput {
 
-    private String userName;
+    private String email;
     private String firstName;
     private String lastName;
     private String phone;
-    private String email;
     private String password;
     private String confirmPassword;
 
