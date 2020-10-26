@@ -2,7 +2,7 @@ package com.api.controller;
 
 import com.api.config.Anonymous;
 import com.config.ExecutorsProvider;
-import com.exception.ExceptionHandler;
+import com.api.exceptions.ExceptionHandler;
 import com.util.async.Computation;
 import com.util.enums.Language;
 import io.swagger.v3.oas.annotations.Operation;

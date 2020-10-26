@@ -1,7 +1,7 @@
 package com.api.mapper;
 
 import com.api.entities.User;
-import com.api.model.UserInput;
+import com.api.input.UserInput;
 import com.api.output.UserJSON;
 
 

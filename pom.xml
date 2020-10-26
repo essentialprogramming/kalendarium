@@ -11,6 +11,7 @@
 	<modules>
         <module>essentialprogramming-util</module>
         <module>essentialprogramming-api</module>
+		<module>essentialprogramming-auth</module>
 		<module>token-validation</module>
 	</modules>
 
