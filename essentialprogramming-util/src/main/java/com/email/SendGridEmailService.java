@@ -22,8 +22,8 @@ class SendGridEmailService implements EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(SendGridEmailService.class);
 
-    private static final String EMAIL_FROM = DeploymentConfiguration.getProperty("EMAIL_FROM", "noreply@essentialprogramming.com");
-    private static final String EMAIL_FROM_NAME = DeploymentConfiguration.getProperty("EMAIL_FROM_NAME", "EssentialProgramming Team");
+    private static final String EMAIL_FROM = DeploymentConfiguration.getProperty("EMAIL_FROM", "noreply@kalendarium.com");
+    private static final String EMAIL_FROM_NAME = DeploymentConfiguration.getProperty("EMAIL_FROM_NAME", "Kalendarium Team");
 
     private final SendGrid sendGridClient;
 

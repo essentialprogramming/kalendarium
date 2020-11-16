@@ -17,10 +17,6 @@ _Domain Model_
 ![Domain Model](documents/Domain_model.png)
 _Design Model Concurrency_
 ![Design Model Concurrency](documents/Design_Model_Concurrency.png)
-_Reservation Domain Model_
-![Reservation Domain Model](documents/Reservation-Domain-Model.png)
-_Company Domain Model_
-![Company Domain Model](documents/Company-Domain-Model.png)
 _See [documents](documents) for all diagrams_
 
 # Tools and technologies used

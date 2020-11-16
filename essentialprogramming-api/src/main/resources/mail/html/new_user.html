@@ -1,12 +1,18 @@
-<div th:fragment="new_user" xmlns:th="http://www.thymeleaf.org">
-    <p><h4 th:text="#{new_user.header.text}"></h4></p>
+<div style="text-align: center;" th:fragment="new_user" xmlns:th="http://www.thymeleaf.org">
+<!--    <p><h4 th:text="#{new_user.header.text}"></h4></p>-->
+<!--    <br/>-->
+
+    <br/>
     <br/>
 
     <!--/*@thymesVar id="fullName" type="java.lang.String"*/-->
-    <strong th:text="${fullName}"></strong>
+    <strong style="text-align: center" th:text="${fullName} + ','"></strong>
     <br/>
     <br/>
-    <span th:text="#{new_user.thankyou}"></span>
+    <span style="text-align: center" th:text="#{new_user.thankyou}"></span>
+    <br/>
+    <span style="text-align: center" th:text="#{new_user.thankyou2}"></span>
+
     <br/>
     <br/>
     <div style="
@@ -15,8 +21,8 @@
         <!--/*@thymesVar id="confirmationLink" type="java.lang.String"*/-->
         <a href="#" th:href="${confirmationLink}" th:text="#{new_user.confirmaccount}" target="_other" rel="nofollow"
            style="
-    background: #ef8860;
-    color: #fff;
+    background: #2c3333;
+    color: #69bdd2;
     text-decoration: none;
     padding: 10px;
     display: inline-block;
@@ -29,8 +35,10 @@
     <br/>
     <br/>
 
-    <span th:text="#{new_user.aftersuccessful}"></span>
-    <div style="margin-left:35px;">
+    <div style="text-align:center;">
+        <span   th:text="#{new_user.aftersuccessful}"></span>
+    </div>
+    <div style="text-align:center;">
         <br/>
         <span th:text="#{new_user.list.generate.qr}"></span>
         <br/>
@@ -42,5 +50,7 @@
     </div>
     <br/>
     <br/>
-    <span th:text="#{new_user.regards}"></span>
+    <span style="text-align: center" th:text="#{new_user.regards}"></span>
+    <br/>
+    <span style="text-align: center" th:text="#{new_user.regards2}"></span>
 </div>
