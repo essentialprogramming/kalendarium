@@ -22,9 +22,6 @@ public class Account {
     @Column(name = "userid", nullable = false, unique = true)
     private int id;
 
-    @Column(name = "username")
-    private String username;
-
     @Column(name = "firstname")
     private String firstName;
 
@@ -66,8 +63,7 @@ public class Account {
     private String password;
 
 
-    public Account(String username, String email,  String userKey,String firstName, String lastName,  String phone) {
-        this.username = username;
+    public Account( String email,  String userKey,String firstName, String lastName,  String phone) {
         this.email = email;
         this.userKey = userKey;
         this.firstName = firstName;
