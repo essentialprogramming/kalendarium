@@ -1,12 +1,8 @@
 # Kalendarium
 
----
+The objective of Kalendarium is to offer users a platform on which they can make appointments to different activities.  
 
 http://159.65.124.175:8080/apidoc
-
-# Requirements  
-
-The objective of Kalendarium is to offer users a platform on which they can make appointments to different activities.  
 
 # Diagrams
 _Architecture Diagram_
