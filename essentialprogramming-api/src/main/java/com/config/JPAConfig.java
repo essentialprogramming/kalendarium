@@ -64,6 +64,7 @@ public class JPAConfig {
         Properties properties = new Properties();
         //properties.setProperty("hibernate.show_sql", "true"); //DON'T USE THIS. USE log4j to configure log level of SQL statements
         properties.setProperty("hibernate.format_sql", "true");
+        properties.setProperty("hibernate.default_schema", "public");
 
         return properties;
     }

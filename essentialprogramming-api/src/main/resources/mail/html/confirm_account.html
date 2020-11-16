@@ -1,0 +1,15 @@
+<div th:fragment="confirm_account" xmlns:th="http://www.thymeleaf.org">
+    <p><h4 th:text="#{confirm_account.header.text}"></h4></p>
+    <br />
+    <!--/*@thymesVar id="fullName" type="java.lang.String"*/-->
+    <strong th:text="${fullName}"></strong>
+    <br />
+	<br />
+    <span th:text="#{confirm_account.thankyou}"></span>
+    <br />
+    <br />
+
+    <br />
+    <br />
+    <span th:text="#{confirm_account.regards}"></span>
+</div>
