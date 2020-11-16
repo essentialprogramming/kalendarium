@@ -185,6 +185,18 @@ public class BusinessService {
         Business business = getBusinessForUser(user, language);
         return makeBusinessJSON(business);
     }
+
+    @Transactional
+    public List<BusinessJSON> loadAll() throws ApiException, GeneralSecurityException {
+        List<Business> businesses = businessRepository.findAll();
+        List<BusinessJSON> jsons = new ArrayList<>();
+
+        for(Business business : businesses)
+        {
+            jsons.add(makeBusinessJSON(business));
+        }
+        return jsons;
+    }
     
 
     
@@ -248,8 +260,6 @@ public class BusinessService {
 
 
     @Transactional
-
-
     Business getBusinessForUser(User user, Language language) {
 
         List<BusinessUsers> businessUsers = user.getBusinessUsers();

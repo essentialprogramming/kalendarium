@@ -3,7 +3,6 @@ package com.api.output;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Builder
 @Getter

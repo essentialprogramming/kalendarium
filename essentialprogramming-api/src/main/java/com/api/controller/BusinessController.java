@@ -51,6 +51,26 @@ public class BusinessController {
     }
 
     @GET
+    @Path("business/all")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Load all business", tags = {"Business",},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Returns businesses.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)))
+            })
+    public void loadAll(@HeaderParam("Authorization") String authorization, @Suspended AsyncResponse asyncResponse) {
+
+        final String bearer = AuthUtils.extractBearerToken(authorization);
+        final String email = AuthUtils.getClaim(bearer, "email");
+        ExecutorService executorService = ExecutorsProvider.getExecutorService();
+        Computation.computeAsync(() -> businessService.loadAll(), executorService)
+                .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
+                .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
+    }
+
+    @GET
     @Path("business/load")
     @Consumes("application/json")
     @Produces(MediaType.APPLICATION_JSON)
