@@ -25,6 +25,8 @@ import java.util.Collections;
 
 @ApplicationPath("/api")
 
+
+
 public class ApplicationConfig extends ResourceConfig {
 
     public ApplicationConfig() {
