@@ -1,7 +1,6 @@
 DROP TABLE IF EXISTS `User`;
 create table if not exists public."user" (
   userid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
-  UserName varchar(50) NOT NULL,
   FirstName varchar(255)  NOT NULL,
   LastName varchar(255) NOT NULL,
   Email varchar(50) NOT NULL,
