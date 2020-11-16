@@ -1,6 +1,6 @@
 package com.undertow.standalone;
 
-import static com.config.ApplicationContextFactory.getSpringApplicationContext;
+import static com.config.spring.ApplicationContextFactory.getSpringApplicationContext;
 import static io.undertow.servlet.Servlets.defaultContainer;
 import static io.undertow.servlet.Servlets.deployment;
 import static io.undertow.servlet.Servlets.servlet;

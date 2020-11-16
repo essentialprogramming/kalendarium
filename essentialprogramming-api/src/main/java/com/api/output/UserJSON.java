@@ -11,7 +11,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class UserJSON implements Serializable {
 
-    private String userName;
     private String email;
     private String userKey;
     private String firstName;

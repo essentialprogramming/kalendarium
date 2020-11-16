@@ -1,13 +1,13 @@
 package com.authentication.controller;
 
 import com.authentication.channel.AccessChannel;
-import com.authentication.identityprovider.internal.model.PasswordInput;
+import com.identityprovider.model.PasswordInput;
 import com.authentication.request.AuthRequest;
 import com.authentication.response.AccessToken;
 import com.authentication.service.AuthenticationService;
-import com.config.ExecutorsProvider;
-import com.api.exceptions.ExceptionHandler;
-import com.api.exceptions.PasswordException;
+import com.config.spring.ExecutorsProvider;
+import com.exceptions.ExceptionHandler;
+import com.exceptions.PasswordException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.util.async.Computation;
 import com.util.enums.Language;

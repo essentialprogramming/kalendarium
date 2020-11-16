@@ -1,8 +1,8 @@
 package com.api.controller;
 
 import com.api.config.Anonymous;
-import com.config.ExecutorsProvider;
-import com.api.exceptions.ExceptionHandler;
+import com.config.spring.ExecutorsProvider;
+import com.exceptions.ExceptionHandler;
 import com.util.async.Computation;
 import com.util.enums.Language;
 import io.swagger.v3.oas.annotations.Operation;

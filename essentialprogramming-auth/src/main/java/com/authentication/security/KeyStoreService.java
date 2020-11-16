@@ -1,6 +1,6 @@
 package com.authentication.security;
 
-import com.authentication.exceptions.codes.ErrorCode;
+import com.exceptions.codes.ErrorCode;
 import com.util.cloud.DeploymentConfiguration;
 import com.util.cloud.DeploymentStrategy;
 import com.util.cloud.SystemProperty;

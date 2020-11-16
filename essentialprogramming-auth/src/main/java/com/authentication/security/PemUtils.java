@@ -1,6 +1,6 @@
 package com.authentication.security;
 
-import com.authentication.exceptions.codes.ErrorCode;
+import com.exceptions.codes.ErrorCode;
 import com.util.exceptions.ServiceException;
 import com.util.io.FileInputResource;
 import java.security.KeyFactory;

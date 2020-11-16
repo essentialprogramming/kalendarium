@@ -1,12 +1,12 @@
 package com.api.controller;
 
 import com.api.config.Anonymous;
-import com.api.exceptions.ExceptionHandler;
+import com.exceptions.ExceptionHandler;
 import com.api.input.BusinessInput;
 import com.api.output.UserJSON;
 import com.api.service.BusinessService;
 import com.api.service.UserService;
-import com.config.ExecutorsProvider;
+import com.config.spring.ExecutorsProvider;
 import com.internationalization.Messages;
 import com.token.validation.auth.AuthUtils;
 import com.util.async.Computation;
@@ -33,7 +33,7 @@ import java.util.concurrent.ExecutorService;
 
 import static java.lang.Boolean.TRUE;
 
-@Path("/security/")
+@Path("/")
 public class BusinessController {
 
     private static final Logger LOG = LoggerFactory.getLogger(BusinessController.class);
@@ -50,7 +50,7 @@ public class BusinessController {
         this.userService = userService;
     }
 
-    @POST
+    @GET
     @Path("business/load")
     @Consumes("application/json")
     @Produces(MediaType.APPLICATION_JSON)

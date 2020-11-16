@@ -28,7 +28,7 @@ import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.api.env.resources.AppResources.ENCRYPTION_KEY;
+import static com.resources.AppResources.ENCRYPTION_KEY;
 
 @Service
 public class BusinessService {

@@ -9,7 +9,6 @@ public class UserMapper {
 
     public static User inputToUser(UserInput input) {
         return User.builder()
-                .username(input.getEmail())
                 .firstName(input.getFirstName())
                 .lastName(input.getLastName())
                 .email(input.getEmail())
@@ -19,7 +18,6 @@ public class UserMapper {
 
     public static UserJSON userToJson(User user) {
         return UserJSON.builder()
-                .userName(user.getUsername())
                 .email(user.getEmail())
                 .userKey(user.getUserKey())
                 .firstName(user.getFirstName())

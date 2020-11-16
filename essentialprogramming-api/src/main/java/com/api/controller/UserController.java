@@ -4,8 +4,8 @@ import com.api.config.Anonymous;
 import com.api.output.UserJSON;
 import com.api.service.UserService;
 import com.api.input.*;
-import com.config.ExecutorsProvider;
-import com.api.exceptions.ExceptionHandler;
+import com.config.spring.ExecutorsProvider;
+import com.exceptions.ExceptionHandler;
 import com.internationalization.Messages;
 import com.token.validation.auth.AuthUtils;
 import com.util.async.Computation;
@@ -31,7 +31,7 @@ import java.security.GeneralSecurityException;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 
-@Path("/security/")
+@Path("/")
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
@@ -77,7 +77,7 @@ public class UserController {
 
 
 
-    @POST
+    @GET
     @Path("user/load")
     @Consumes("application/json")
     @Produces(MediaType.APPLICATION_JSON)

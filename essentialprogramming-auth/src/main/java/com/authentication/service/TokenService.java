@@ -1,7 +1,7 @@
 package com.authentication.service;
 
-import com.authentication.exceptions.codes.ErrorCode;
-import com.authentication.exceptions.codes.LoginProperties;
+import com.exceptions.codes.ErrorCode;
+import com.exceptions.codes.LoginProperties;
 import com.authentication.security.KeyStoreService;
 import com.authentication.security.PemUtils;
 import com.nimbusds.jose.jwk.JWK;

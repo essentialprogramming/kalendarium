@@ -2,17 +2,17 @@ package com.authentication.service;
 
 
 import com.authentication.channel.AccessChannel;
-import com.authentication.claims.PrivateClaimType;
-import com.authentication.identityprovider.AuthenticationProvider;
-import com.authentication.identityprovider.internal.entities.Account;
-import com.authentication.exceptions.codes.ErrorCode;
-import com.authentication.identityprovider.internal.model.ResetPasswordInput;
-import com.authentication.identityprovider.internal.repository.AccountRepository;
-import com.authentication.identityprovider.internal.service.AccountService;
-import com.authentication.identityprovider.internal.model.PasswordInput;
-import com.authentication.oauth2.OAuth2Constants;
+import com.oauth2.claims.PrivateClaimType;
+import com.identityprovider.AuthenticationProvider;
+import com.identityprovider.entities.Account;
+import com.exceptions.codes.ErrorCode;
+import com.identityprovider.model.ResetPasswordInput;
+import com.identityprovider.repository.AccountRepository;
+import com.identityprovider.service.AccountService;
+import com.identityprovider.model.PasswordInput;
+import com.oauth2.OAuth2Constants;
 import com.authentication.request.TokenRequest;
-import com.api.exceptions.PasswordException;
+import com.exceptions.PasswordException;
 import com.internationalization.Messages;
 import com.util.enums.HTTPCustomStatus;
 import com.util.enums.Language;

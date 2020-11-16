@@ -1,7 +1,7 @@
 package com.config;
 
 
-import com.api.env.resources.AppResources;
+import com.resources.AppResources;
 import com.util.cloud.ConfigurationManager;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({"com.api.entities", "com.authentication.identityprovider.internal.entities"})
-@EnableJpaRepositories({"com.api.repository", "com.authentication.identityprovider.internal.repository"})
+@ComponentScan({"com.api.entities", "com.identityprovider.entities"})
+@EnableJpaRepositories({"com.api.repository", "com.identityprovider.repository"})
 public class JPAConfig {
 
     private final com.util.cloud.Configuration configuration = ConfigurationManager.getConfiguration();
@@ -50,7 +50,7 @@ public class JPAConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean() {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(hikariDataSource());
-        factoryBean.setPackagesToScan("com.api.entities","com.authentication.identityprovider.internal.entities");
+        factoryBean.setPackagesToScan("com.api.entities","com.identityprovider.entities");
         factoryBean.setJpaProperties(properties());
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();

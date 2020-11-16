@@ -1,7 +1,7 @@
 package com.crypto;
 
 
-import com.authentication.exceptions.codes.ErrorCode;
+import com.exceptions.codes.ErrorCode;
 import com.util.exceptions.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -9,9 +9,8 @@ import com.util.web.URLHelper;
 
 import java.security.GeneralSecurityException;
 import java.util.List;
-import java.util.Optional;
 
-import static com.api.env.resources.AppResources.ENCRYPTION_KEY;
+import static com.resources.AppResources.ENCRYPTION_KEY;
 
 
 public class BusinessMapper {
