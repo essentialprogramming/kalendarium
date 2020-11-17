@@ -1,0 +1,139 @@
+DROP TABLE IF EXISTS `User`;
+DROP TABLE IF EXISTS `HistoryUser`;
+DROP TABLE IF EXISTS `Address`;
+DROP TABLE IF EXISTS `HistoryAddress`;
+DROP TABLE IF EXISTS `Bussiness`;
+DROP TABLE IF EXISTS `BusinessUsers`;
+DROP TABLE IF EXISTS `HistoryBusiness`;
+DROP TABLE IF EXISTS `Country`;
+DROP TABLE IF EXISTS `Language`;
+DROP TABLE IF EXISTS `State`;
+
+
+create table if not exists public."user" (
+  userid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  UserName varchar(50) NOT NULL,
+  FirstName varchar(255)  NOT NULL,
+  LastName varchar(255) NOT NULL,
+  Email varchar(255) NOT NULL,
+  Phone varchar(30) NOT NULL,
+  DefaultLanguageId smallint DEFAULT NULL,
+  Validated boolean NOT NULL,
+  UserKey varchar(64) DEFAULT NULL,
+  HistoryUserId smallint DEFAULT NULL,
+  Active boolean NOT NULL ,
+  Deleted boolean NOT NULL ,
+  CreatedDate Timestamp DEFAULT NULL,
+  ModifiedDate timestamp DEFAULT NULL,
+  CreatedBy smallint DEFAULT NULL,
+  ModifiedBy smallint DEFAULT NULL,
+  Logkey char(38) DEFAULT NULL,
+  Password varchar(200) DEFAULT NULL
+);
+
+create table if not exists public."historyuser" (
+  historyuserid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  userid smallint DEFAULT NULL,
+  username varchar(255) NOT NULL,
+  firstname varchar(255)  NOT NULL,
+  lastname varchar(255) NOT NULL,
+  email varchar(50) NOT NULL,
+  phone varchar(20) NOT NULL,
+  defaultlanguageid smallint DEFAULT NULL,
+  validated boolean NOT NULL,
+  userkey varchar(64) DEFAULT NULL,
+  active boolean NOT NULL ,
+  deleted boolean NOT NULL ,
+  createdDate Timestamp DEFAULT NULL,
+  createdBy smallint DEFAULT NULL
+);
+
+create table if not exists public."address" (
+  addressid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  street varchar(255) NOT NULL,
+  city varchar(255) NOT NULL,
+  zip varchar(255) NOT NULL,
+  historyaddressid smallint DEFAULT NULL,
+  active boolean NOT NULL,
+  deleted boolean NOT NULL,
+  createddate timestamp DEFAULT NULL,
+  modifieddate timestamp DEFAULT NULL,
+  createdby smallint DEFAULT NULL,
+  modifiedby smallint DEFAULT NULL,
+  countryid smallint DEFAULT NULL,
+  stateid smallint DEFAULT NULL
+);
+
+create table if not exists public."historyAddress" (
+  historyaddressid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  street varchar(255) NOT NULL,
+  city varchar(255) NOT NULL,
+  zip varchar(50) NOT NULL,
+  addressid smallint DEFAULT NULL,
+  active boolean NOT NULL,
+  deleted boolean NOT NULL,
+  createddate timestamp DEFAULT NULL,
+  createdby smallint DEFAULT NULL
+);
+
+create table if not exists public."bussiness" (
+  businessid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  name varchar(255) NOT NULL,
+  addressid smallint DEFAULT NULL,
+  phone varchar(50) NOT NULL,
+  email varchar(255) NOT NULL,
+  businesscode varchar(1000) NOT NULL,
+  historybusinessid smallint DEFAULT NULL,
+  active boolean NOT NULL,
+  deleted boolean NOT NULL,
+  createddate timestamp DEFAULT NULL,
+  modifieddate timestamp DEFAULT NULL,
+  createdby smallint DEFAULT NULL,
+  modifiedby smallint DEFAULT NULL,
+  validated boolean NOT NULL
+);
+
+create table if not exists public."historybusiness" (
+  historybusinessid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  name varchar(255) NOT NULL,
+  addressid smallint DEFAULT NULL,
+  phone varchar(50) NOT NULL,
+  email varchar(255) NOT NULL,
+  businesscode varchar(1000) NOT NULL,
+  businessid smallint DEFAULT NULL,
+  active boolean NOT NULL,
+  deleted boolean NOT NULL,
+  createddate timestamp DEFAULT NULL,
+  createdby smallint DEFAULT NULL
+);
+
+create table if not exists public."businessusers" (
+  
+  createddate timestamp DEFAULT NULL,
+  businessId smallint DEFAULT NULL,
+  userId smallint DEFAULT NULL
+);
+
+create table if not exists public."country" (
+  countryid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  name varchar(255) NOT NULL,
+  defaultlocale varchar(255) NOT NULL,
+  displayorder int DEFAULT NULL,
+  countrycode varchar(255) NOT NULL
+);
+
+create table if not exists public."language" (
+  languageid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  name varchar(255) NOT NULL,
+  symbol varchar(255) NOT NULL,
+  displayorder int DEFAULT NULL
+
+);
+
+create table if not exists public."state" (
+  stateid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  name varchar(255) NOT NULL,
+  abbreviation varchar(50) NOT NULL,
+  stateCode varchar(50) NOT NULL,
+  countryid smallint DEFAULT NULL
+);
