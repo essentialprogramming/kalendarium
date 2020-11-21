@@ -18,10 +18,7 @@ public class BusinessJSON implements Serializable {
     private String city;
     private String phone;
     private String email;
-    private String linkToMenu;
     private String responsible;
-    private String menuType;
-    private String fileName;
     private CountryJSON country;
     private StateJSON state;
 }

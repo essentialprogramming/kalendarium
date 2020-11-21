@@ -65,7 +65,7 @@ public class BusinessController {
         final String bearer = AuthUtils.extractBearerToken(authorization);
         final String email = AuthUtils.getClaim(bearer, "email");
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> businessService.loadAll(), executorService)
+        Computation.computeAsync(businessService::loadAll, executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }

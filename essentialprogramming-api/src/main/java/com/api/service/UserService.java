@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -44,6 +45,7 @@ public class UserService {
 
         User user = UserMapper.inputToUser(input);
         User result = saveUser(user, input, language);
+        user.setCreatedBy(result.getId());
 
         String validationKey = Crypt.encrypt(result.getUserKey(), Crypt.encrypt(result.getUserKey(), result.getUserKey()));
         String encryptedUserKey = Crypt.encrypt(user.getUserKey(), AppResources.ENCRYPTION_KEY.value());
@@ -84,8 +86,11 @@ public class UserService {
 
         String uuid = String.valueOf(UUID.randomUUID());
         String validationKey = Crypt.encrypt(uuid, Crypt.encrypt(uuid, uuid));  //activationKey
+        LocalDateTime now = LocalDateTime.now();
 
         user.setUserKey(uuid);
+        user.setCreatedDate(now);
+
 
         userRepository.save(user);
         if (user.getId() > 0) {

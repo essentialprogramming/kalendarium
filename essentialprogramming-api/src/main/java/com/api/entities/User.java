@@ -53,7 +53,7 @@ public class User {
     private boolean deleted;
 
     @Column(name = "createddate")
-    private LocalDateTime cratedDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "modifiedby")
     private Integer modifiedBy;
