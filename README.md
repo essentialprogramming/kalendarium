@@ -10,7 +10,7 @@ _Architecture Diagram_
 _Use Case Diagram_
 ![Use Case Diagram](documents/Use_Case_Diagram.png)
 _Domain Model_
-![Domain Model](documents/Domain_model.png)
+![Domain Model](documents/Domain_model_final.png)
 _Design Model Concurrency_
 ![Design Model Concurrency](documents/Design_Model_Concurrency.png)
 _See [documents](documents) for all diagrams_
