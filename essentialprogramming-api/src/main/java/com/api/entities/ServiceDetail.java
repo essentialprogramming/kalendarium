@@ -3,16 +3,17 @@ package com.api.entities;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "businessunit")
-@Table(name = "businessunit")
+@Entity(name = "servicedetail")
+@Table(name = "servicedetail")
 public class ServiceDetail {
 
     @Id

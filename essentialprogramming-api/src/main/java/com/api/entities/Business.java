@@ -86,9 +86,6 @@ public class Business {
 
 
 
-
-
-
     public void addBusinessHistory(BusinessHistory businessHistory) {
         if (businessHistories == null) {
             businessHistories = new ArrayList<>();

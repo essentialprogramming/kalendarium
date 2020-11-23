@@ -8,6 +8,55 @@ DROP TABLE IF EXISTS `HistoryBusiness`;
 DROP TABLE IF EXISTS `Country`;
 DROP TABLE IF EXISTS `Language`;
 DROP TABLE IF EXISTS `State`;
+DROP TABLE IF EXISTS `Address`;
+DROP TABLE IF EXISTS `Appointment`;
+DROP TABLE IF EXISTS `BusinessService`;
+DROP TABLE IF EXISTS `BusinessUnit`;
+DROP TABLE IF EXISTS `Subscription`;
+
+
+create table if not exists public."subscription"(
+  subscriptionid  smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  businessid smallint DEFAULT NULL,
+  userid smallint DEFAULT NULL,
+);
+
+create table if not exists public."businessunit"(
+  businessunitid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  businessid smallint DEFAULT NULL,
+);
+
+
+create table if not exists public."businessservice"(
+  businessserviceid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  servicedetailid smallint DEFAULT NULL,
+  businessid smallint DEFAULT NULL
+);
+
+create table if not exists public."appointment"(
+  appointmentid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  businessid smallint DEFAULT NULL,
+  businessunitid smallint DEFAULT NULL,
+  businessserviceid smallint DEFAULT NULL,
+  userid smallint DEFAULT NULL,
+  status smallint DEFAULT NULL
+);
+
+create table if not exists public."address"(
+  addressid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  street varchar(200),
+  city varchar(100),
+  zip varchar(50),
+  historyaddressid smallint DEFAULT NULL,
+  active boolean NOT NULL,
+  deleted boolean NOT NULL,
+  createddate timestamp DEFAULT NULL,
+  modifieddate timestamp DEFAULT NULL,
+  createby smallint DEFAULT NULL,
+  modifedby smallint DEFAULT NULL,
+  countryid smallint DEFAULT NULL,
+  stateid smallint DEFAULT NULL,
+);
 
 
 create table if not exists public."user" (
