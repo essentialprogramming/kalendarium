@@ -1,7 +1,7 @@
 package com.api.mapper;
 
 import com.api.entities.Address;
-import com.api.entities.AddressHistory;
+import com.api.entities.history.AddressHistory;
 import com.api.input.BusinessInput;
 
 import java.time.LocalDateTime;

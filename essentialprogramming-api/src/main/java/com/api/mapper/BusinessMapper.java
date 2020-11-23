@@ -1,7 +1,7 @@
 package com.api.mapper;
 
 import com.api.entities.Business;
-import com.api.entities.BusinessHistory;
+import com.api.entities.history.BusinessHistory;
 import com.api.input.BusinessInput;
 import com.api.output.BusinessJSON;
 import com.crypto.Crypt;

@@ -67,6 +67,12 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<BusinessUsers> businessUsers;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Appointment> appointments;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Subscription> subscriptions;
+
 
 
     public String getFullName() {

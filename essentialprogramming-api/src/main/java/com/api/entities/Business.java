@@ -1,5 +1,6 @@
 package com.api.entities;
 
+import com.api.entities.history.BusinessHistory;
 import lombok.*;
 
 import javax.persistence.*;
@@ -70,6 +71,20 @@ public class Business {
 
     @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
     private List<BusinessUsers> managers;
+
+    @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
+    private List<BusinessService> businessServices;
+
+    @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
+    private List<BusinessUnit> businessUnits;
+
+    @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
+    private List<Appointment> appointments;
+
+    @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
+    private List<Subscription> subscriptions;
+
+
 
 
 

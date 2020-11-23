@@ -1,5 +1,7 @@
-package com.api.entities;
+package com.api.entities.history;
 
+import com.api.entities.Address;
+import com.api.entities.User;
 import lombok.*;
 
 import javax.persistence.*;

@@ -1,7 +1,7 @@
 package com.api.mapper;
 
 
-import com.api.entities.HistoryUser;
+import com.api.entities.history.HistoryUser;
 import com.api.output.HistoryUserJSON;
 
 public class HistoryUserMapper {

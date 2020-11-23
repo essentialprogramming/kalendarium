@@ -1,6 +1,8 @@
 package com.api.service;
 
 import com.api.entities.*;
+import com.api.entities.history.AddressHistory;
+import com.api.entities.history.BusinessHistory;
 import com.api.input.BusinessInput;
 import com.api.mapper.AddressMapper;
 import com.api.mapper.BusinessMapper;
