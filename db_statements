@@ -13,10 +13,18 @@ DROP TABLE IF EXISTS `Appointment`;
 DROP TABLE IF EXISTS `BusinessService`;
 DROP TABLE IF EXISTS `BusinessUnit`;
 DROP TABLE IF EXISTS `Subscription`;
+DROP TABLE IF EXISTS `ServiceDetail`;
 
+
+create table if not exists public."servicedetail"(
+  servicedetailid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  date timestamp DEFAULT NULL,
+  starttime timestamp DEFAULT NULL,
+  duration bigint DEFAULT NULL
+);
 
 create table if not exists public."subscription"(
-  subscriptionid  smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
+  subscriptionid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
   businessid smallint DEFAULT NULL,
   userid smallint DEFAULT NULL,
 );
