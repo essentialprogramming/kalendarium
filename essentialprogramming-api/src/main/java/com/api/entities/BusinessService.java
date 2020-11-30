@@ -27,10 +27,13 @@ public class BusinessService {
     @JoinColumn(name = "businessid")
     private Business business;
 
-    @OneToMany(mappedBy = "businessservice" ,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "businessService" ,fetch = FetchType.LAZY)
     private List<Appointment> appointments;
 
-    @OneToMany(mappedBy = "businessservice" ,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "businessService" ,fetch = FetchType.LAZY)
     private List<Subscription> subscriptions;
+
+    @Column(name = "businessservicecode")
+    private String businessServiceCode;
 
 }

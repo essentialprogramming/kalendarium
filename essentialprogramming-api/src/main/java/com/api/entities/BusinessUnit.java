@@ -23,8 +23,10 @@ public class BusinessUnit {
     @JoinColumn(name = "businessid")
     private Business business;
 
-    @OneToMany (mappedBy = "businessunit", fetch = FetchType.LAZY)
+    @OneToMany (mappedBy = "businessUnit", fetch = FetchType.LAZY)
     private List<Appointment> appointments;
 
+    @Column(name = "businessunitcode")
+    private String businessUnitCode;
 
 }

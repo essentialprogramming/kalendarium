@@ -35,5 +35,6 @@ public class Subscription {
     @OneToMany(mappedBy = "subscription",fetch = FetchType.LAZY)
     private List<Appointment> appointments;
 
-
+    @Column(name = "subscriptioncode")
+    private String subscriptionCode;
 }

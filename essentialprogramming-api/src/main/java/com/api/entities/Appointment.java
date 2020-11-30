@@ -35,8 +35,14 @@ public class Appointment {
     @JoinColumn(name="userid")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subscriptionid")
+    private Subscription subscription;
 
     @Column(name = "status")
     private AppointmentStatus status;
+
+    @Column(name = "appointmentcode")
+    private String appointmentCode;
 
 }
