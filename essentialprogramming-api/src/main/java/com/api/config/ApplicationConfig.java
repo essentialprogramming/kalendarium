@@ -35,6 +35,7 @@ public class ApplicationConfig extends ResourceConfig {
         register(JacksonJaxbJsonProvider.class);
         register(UserController.class);
         register(BusinessController.class);
+        register(BusinessServiceController.class);
         register(CountryController.class);
         register(WelcomeController.class);
         register(SecurityFeature.class);

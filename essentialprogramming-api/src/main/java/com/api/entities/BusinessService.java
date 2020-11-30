@@ -19,7 +19,7 @@ public class BusinessService {
     @Column(name = "businessserviceid", nullable = false, unique = true)
     private int id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "servicedetailid")
     private ServiceDetail serviceDetail;
 
@@ -35,5 +35,8 @@ public class BusinessService {
 
     @Column(name = "businessservicecode")
     private String businessServiceCode;
+
+    @Column(name = "name")
+    private String name;
 
 }
