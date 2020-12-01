@@ -6,6 +6,7 @@ import com.api.output.BusinessServiceJSON;
 import com.crypto.Crypt;
 
 import java.security.GeneralSecurityException;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import static com.resources.AppResources.ENCRYPTION_KEY;
@@ -22,12 +23,19 @@ public class BusinessServiceMapper {
     }
 
     public static BusinessServiceJSON businessServiceToOutput(BusinessService business) throws GeneralSecurityException {
+        final LocalTime endTime = business.getServiceDetail().getEndTime();
+        String end = endTime !=null ? endTime.format(FORMATTER) : null;
+
+        final LocalTime startTime = business.getServiceDetail().getStartTime();
+        String start = startTime !=null ? startTime.format(FORMATTER) : null;
+
+
         return BusinessServiceJSON.builder()
                 .name(business.getName())
                 .duration(business.getServiceDetail().getDuration())
                 .businessServiceCode(Crypt.encrypt(business.getBusinessServiceCode(), ENCRYPTION_KEY.value()))
-                .endTime(business.getServiceDetail().getEndTime().format(FORMATTER))
-                .startTime(business.getServiceDetail().getStartTime().format(FORMATTER))
+                .endTime(end)
+                .startTime(start)
                 .days(business.getServiceDetail().getDay())
                 .build();
     }

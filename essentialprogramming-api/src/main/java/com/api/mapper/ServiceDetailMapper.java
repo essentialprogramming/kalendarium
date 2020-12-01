@@ -13,10 +13,16 @@ public class ServiceDetailMapper {
 
     public static ServiceDetail inputToServiceDetail(BusinessServiceInput businessServiceInput)
     {
+        final String endTime = businessServiceInput.getEndTime();
+        final String startTime = businessServiceInput.getStartTime();
+
+        LocalTime start = startTime!=null ? LocalTime.parse(startTime, FORMATTER) : null;
+        LocalTime end = endTime!=null ? LocalTime.parse(endTime, FORMATTER) : null;
+
         return ServiceDetail.builder()
                 .duration(businessServiceInput.getDuration())
-                .startTime(LocalTime.parse(businessServiceInput.getStartTime(), FORMATTER))
-                .endTime(LocalTime.parse(businessServiceInput.getEndTime(), FORMATTER))
+                .startTime(start)
+                .endTime(end)
                 .day(businessServiceInput.getDays())
                 .build();
     }

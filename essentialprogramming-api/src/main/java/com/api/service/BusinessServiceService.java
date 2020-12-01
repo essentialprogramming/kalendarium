@@ -50,8 +50,8 @@ public class BusinessServiceService {
     public void save(String email, BusinessServiceInput businessServiceInput, Language language, int version) throws GeneralSecurityException {
         final boolean encrypted = (version == 0);
 
-        String businessCode =businessServiceInput.getBusinessCode();
-        businessCode  = encrypted ? Crypt.decrypt(businessCode, ENCRYPTION_KEY.value()) : businessCode;
+        String businessCode = businessServiceInput.getBusinessCode();
+        businessCode = encrypted ? Crypt.decrypt(businessCode, ENCRYPTION_KEY.value()) : businessCode;
 
         Business business = businessRepository.findByBusinessCode(businessCode).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESS.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
@@ -59,7 +59,7 @@ public class BusinessServiceService {
 
         ServiceDetail serviceDetail = ServiceDetailMapper.inputToServiceDetail(businessServiceInput);
 
-        ServiceDetail savedServiceDetail=  serviceDetailRepository.save(serviceDetail);
+        ServiceDetail savedServiceDetail = serviceDetailRepository.save(serviceDetail);
 
         BusinessService businessService = BusinessServiceMapper.inputToBusinessService(businessServiceInput);
         businessService.setBusiness(business);
@@ -77,14 +77,22 @@ public class BusinessServiceService {
     public void update(String code, BusinessServiceInput businessServiceInput, Language language, int version) throws GeneralSecurityException {
         final boolean encrypted = (version == 0);
 
-        code  = encrypted ? Crypt.decrypt(code, ENCRYPTION_KEY.value()) : code;
+        code = encrypted ? Crypt.decrypt(code, ENCRYPTION_KEY.value()) : code;
 
         BusinessService businessService = businessServiceRepository.findByBusinessServiceCode(code).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
         );
 
+        ServiceDetail newServiceDetail = ServiceDetailMapper.inputToServiceDetail(businessServiceInput);
         ServiceDetail serviceDetail = businessService.getServiceDetail();
-        serviceDetail.setDuration(businessServiceInput.getDuration());
+        serviceDetail.setDuration(newServiceDetail.getDuration());
+
+        if (newServiceDetail.getDay() != null)
+            serviceDetail.setDay(newServiceDetail.getDay());
+        if (newServiceDetail.getEndTime() != null)
+            serviceDetail.setEndTime(newServiceDetail.getEndTime());
+        if (newServiceDetail.getStartTime() != null)
+            serviceDetail.setStartTime(newServiceDetail.getStartTime());
 
         serviceDetailRepository.save(serviceDetail);
 
@@ -98,16 +106,15 @@ public class BusinessServiceService {
     public List<BusinessServiceJSON> load(String code, Language language, int version) throws GeneralSecurityException {
         final boolean encrypted = (version == 0);
 
-        code  = encrypted ? Crypt.decrypt(code, ENCRYPTION_KEY.value()) : code;
+        code = encrypted ? Crypt.decrypt(code, ENCRYPTION_KEY.value()) : code;
 
         Business business = businessRepository.findByBusinessCode(code).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESS.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
         );
 
-        List<BusinessService>  businessServices = businessServiceRepository.findAllByBusiness(business);
+        List<BusinessService> businessServices = businessServiceRepository.findAllByBusiness(business);
         List<BusinessServiceJSON> businessServiceJSONS = new ArrayList<>();
-        for(BusinessService businessService : businessServices)
-        {
+        for (BusinessService businessService : businessServices) {
             businessServiceJSONS.add(makeBusinessServiceJson(businessService));
         }
 
@@ -125,7 +132,7 @@ public class BusinessServiceService {
 
         final boolean encrypted = (version == 0);
 
-        businessServiceCode  = encrypted ? Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value()) : businessServiceCode;
+        businessServiceCode = encrypted ? Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value()) : businessServiceCode;
 
         businessServiceRepository.deleteByBusinessServiceCode(businessServiceCode);
     }
