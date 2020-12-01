@@ -32,6 +32,7 @@ create table if not exists public."subscription"(
 create table if not exists public."businessunit"(
   businessunitid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
   businessid smallint DEFAULT NULL,
+  name varchar(100)
 );
 
 

@@ -29,4 +29,7 @@ public class BusinessUnit {
     @Column(name = "businessunitcode")
     private String businessUnitCode;
 
+    @Column(name = "name")
+    private String name;
+
 }
