@@ -20,4 +20,23 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
 
     Optional<Business> findByBusinessCodeAndDeleted(@Param("businessCode") String businessCode, @Param("deleted") boolean deleted);
 
+    @Query(value = "select *\n" +
+            "from business b\n" +
+            "where b.name like %?1% or b.businessid in\n" +
+            "    (\n" +
+            "        select bu.businessid\n" +
+            "        from businessunit bu\n" +
+            "        where bu.name like %?1%\n" +
+            "        ) or b.businessid in \n" +
+            "            (\n" +
+            "                select bs.businessid\n" +
+            "                from businessservice bs\n" +
+            "                where bs.name like %?1%\n" +
+            "                ) or b.businessid in \n" +
+            "                    (\n" +
+            "                        select u.employer\n" +
+            "                        from \"user\" u \n" +
+            "                        where u.firstname like %?1% or u.lastname like %?1%\n" +
+            "                        )", nativeQuery = true)
+    List<Business> findAllBusinessByCriteria(String search);
 }

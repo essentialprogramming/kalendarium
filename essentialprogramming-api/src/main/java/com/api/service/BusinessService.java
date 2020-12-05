@@ -272,4 +272,15 @@ public class BusinessService {
         }
         return business;
     }
+
+    @Transactional
+    public List<BusinessJSON> loadAllByCriteria(String search) throws GeneralSecurityException {
+        List<Business> businesses = businessRepository.findAllBusinessByCriteria(search);
+        List<BusinessJSON> jsons = new ArrayList<>();
+        for(Business business : businesses)
+        {
+            jsons.add(makeBusinessJSON(business));
+        }
+        return jsons;
+    }
 }
