@@ -68,6 +68,9 @@ public class Business {
     @Column(name = "validated")
     private boolean validated;
 
+    @OneToMany(mappedBy = "employer", fetch = FetchType.LAZY)
+    private List<User> employees;
+
     @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
     private List<BusinessUsers> managers;
 
