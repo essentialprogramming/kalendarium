@@ -5,9 +5,9 @@ import javax.persistence.Converter;
 import java.util.stream.Stream;
 
 @Converter(autoApply = true)
-public class AppointmentStatusConverter implements AttributeConverter<AppointmentStatus, String> {
+public class AppointmentStatusConverter implements AttributeConverter<AppointmentStatus, Integer> {
     @Override
-    public String convertToDatabaseColumn(AppointmentStatus appointmentStatus) {
+    public Integer convertToDatabaseColumn(AppointmentStatus appointmentStatus) {
         if(appointmentStatus == null)
             return null;
 
@@ -15,12 +15,12 @@ public class AppointmentStatusConverter implements AttributeConverter<Appointmen
     }
 
     @Override
-    public AppointmentStatus convertToEntityAttribute(String code) {
+    public AppointmentStatus convertToEntityAttribute(Integer code) {
         if(code == null)
             return null;
 
         return Stream.of(AppointmentStatus.values())
-                .filter(c -> c.getCode().equals(code))
+                .filter(c -> c.getCode() == code)
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
     }
