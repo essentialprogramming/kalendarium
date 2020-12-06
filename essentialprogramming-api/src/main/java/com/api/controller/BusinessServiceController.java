@@ -2,6 +2,7 @@ package com.api.controller;
 
 import com.api.input.BusinessInput;
 import com.api.input.BusinessServiceInput;
+import com.api.input.BusinessServiceUpdateInput;
 import com.api.output.UserJSON;
 import com.api.service.BusinessServiceService;
 import com.api.service.UserService;
@@ -60,20 +61,19 @@ public class BusinessServiceController {
                             content = @Content(mediaType = "application/json"
                             ))
             })
-    public void create(@HeaderParam("Authorization") String authorization, BusinessServiceInput businessServiceInput,  @DefaultValue("0") @QueryParam("v") int version, @Suspended AsyncResponse asyncResponse) {
+    public void create(@HeaderParam("Authorization") String authorization, BusinessServiceInput businessServiceInput, @Suspended AsyncResponse asyncResponse) {
         final String bearer = AuthUtils.extractBearerToken(authorization);
         final String email = AuthUtils.getClaim(bearer, "email");
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> create(email, businessServiceInput, version), executorService)
+        Computation.computeAsync(() -> create(email, businessServiceInput), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
 
-    private Serializable create(String email, BusinessServiceInput businessServiceInput, int version) throws ApiException {
+    private Serializable create(String email, BusinessServiceInput businessServiceInput) throws ApiException {
         try {
-            UserJSON user = userService.loadUser(email, language);
-            businessServiceService.save(email, businessServiceInput, language, version);
+            businessServiceService.save(email, businessServiceInput, language);
             return TRUE;
         } catch (ApiException e) {
             LOG.error("An error occurred while saving a new business.", e);
@@ -94,10 +94,10 @@ public class BusinessServiceController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void load(@PathParam("business-code") String businessCode, @DefaultValue("0") @QueryParam("v") int version, @Suspended AsyncResponse asyncResponse) {
+    public void load(@PathParam("business-code") String businessCode, @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> businessServiceService.load(businessCode, language, version), executorService)
+        Computation.computeAsync(() -> businessServiceService.load(businessCode, language), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
@@ -114,16 +114,16 @@ public class BusinessServiceController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void update(@PathParam("business-service-code") String businessServiceCode,  @DefaultValue("0") @QueryParam("v") int version, BusinessServiceInput businessServiceInput, @Suspended AsyncResponse asyncResponse) {
+    public void update(@PathParam("business-service-code") String businessServiceCode, BusinessServiceUpdateInput businessServiceInput, @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> update(businessServiceCode, businessServiceInput, version), executorService)
+        Computation.computeAsync(() -> update(businessServiceCode, businessServiceInput), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
 
-    private Serializable update(String businessServiceCode, BusinessServiceInput businessServiceInput, int version) throws ApiException, GeneralSecurityException {
-        businessServiceService.update(businessServiceCode, businessServiceInput, language, version);
+    private Serializable update(String businessServiceCode, BusinessServiceUpdateInput businessServiceInput) throws ApiException, GeneralSecurityException {
+        businessServiceService.update(businessServiceCode, businessServiceInput, language);
         return TRUE;
     }
 
@@ -137,16 +137,16 @@ public class BusinessServiceController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void delete(@PathParam("business-service-code") String businessServiceCode,  @DefaultValue("0") @QueryParam("v") int version,  @Suspended AsyncResponse asyncResponse) {
+    public void delete(@PathParam("business-service-code") String businessServiceCode,  @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> delete(businessServiceCode, version), executorService)
+        Computation.computeAsync(() -> delete(businessServiceCode), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
 
-    private Serializable delete(String businessServiceCode, int version) throws ApiException, GeneralSecurityException {
-        businessServiceService.delete(businessServiceCode, language, version);
+    private Serializable delete(String businessServiceCode) throws ApiException, GeneralSecurityException {
+        businessServiceService.delete(businessServiceCode, language);
         return TRUE;
     }
 }

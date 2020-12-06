@@ -3,10 +3,9 @@ package com.api.service;
 import com.api.entities.Business;
 import com.api.entities.BusinessService;
 import com.api.entities.ServiceDetail;
-import com.api.entities.User;
 import com.api.input.BusinessServiceInput;
+import com.api.input.BusinessServiceUpdateInput;
 import com.api.mapper.*;
-import com.api.output.BusinessJSON;
 import com.api.output.BusinessServiceJSON;
 import com.api.repository.BusinessRepository;
 import com.api.repository.BusinessServiceRepository;
@@ -21,12 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.resources.AppResources.ENCRYPTION_KEY;
 
@@ -49,11 +46,10 @@ public class BusinessServiceService {
     }
 
     @Transactional
-    public void save(String email, BusinessServiceInput businessServiceInput, Language language, int version) throws GeneralSecurityException {
-        final boolean encrypted = (version == 0);
+    public void save(String email, BusinessServiceInput businessServiceInput, Language language) throws GeneralSecurityException {
 
-        String businessCode =businessServiceInput.getBusinessCode();
-        businessCode  = encrypted ? Crypt.decrypt(businessCode, ENCRYPTION_KEY.value()) : businessCode;
+        String businessCode = businessServiceInput.getBusinessCode();
+        businessCode = Crypt.decrypt(businessCode, ENCRYPTION_KEY.value());
 
         Business business = businessRepository.findByBusinessCode(businessCode).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESS.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
@@ -61,7 +57,7 @@ public class BusinessServiceService {
 
         ServiceDetail serviceDetail = ServiceDetailMapper.inputToServiceDetail(businessServiceInput);
 
-        ServiceDetail savedServiceDetail=  serviceDetailRepository.save(serviceDetail);
+        ServiceDetail savedServiceDetail = serviceDetailRepository.save(serviceDetail);
 
         BusinessService businessService = BusinessServiceMapper.inputToBusinessService(businessServiceInput);
         businessService.setBusiness(business);
@@ -76,17 +72,23 @@ public class BusinessServiceService {
     }
 
     @Transactional
-    public void update(String code, BusinessServiceInput businessServiceInput, Language language, int version) throws GeneralSecurityException {
-        final boolean encrypted = (version == 0);
-
-        code  = encrypted ? Crypt.decrypt(code, ENCRYPTION_KEY.value()) : code;
+    public void update(String code, BusinessServiceUpdateInput businessServiceInput, Language language) throws GeneralSecurityException {
+        code = Crypt.decrypt(code, ENCRYPTION_KEY.value());
 
         BusinessService businessService = businessServiceRepository.findByBusinessServiceCode(code).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
         );
 
+        ServiceDetail newServiceDetail = ServiceDetailMapper.updateInputToServiceDetail(businessServiceInput);
         ServiceDetail serviceDetail = businessService.getServiceDetail();
-        serviceDetail.setDuration(businessServiceInput.getDuration());
+        serviceDetail.setDuration(newServiceDetail.getDuration());
+
+        if (newServiceDetail.getDay() != null)
+            serviceDetail.setDay(newServiceDetail.getDay());
+        if (newServiceDetail.getEndTime() != null)
+            serviceDetail.setEndTime(newServiceDetail.getEndTime());
+        if (newServiceDetail.getStartTime() != null)
+            serviceDetail.setStartTime(newServiceDetail.getStartTime());
 
         serviceDetailRepository.save(serviceDetail);
 
@@ -97,19 +99,16 @@ public class BusinessServiceService {
     }
 
     @Transactional
-    public List<BusinessServiceJSON> load(String code, Language language, int version) throws GeneralSecurityException {
-        final boolean encrypted = (version == 0);
-
-        code  = encrypted ? Crypt.decrypt(code, ENCRYPTION_KEY.value()) : code;
+    public List<BusinessServiceJSON> load(String code, Language language) throws GeneralSecurityException {
+        code = Crypt.decrypt(code, ENCRYPTION_KEY.value());
 
         Business business = businessRepository.findByBusinessCode(code).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESS.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
         );
 
-        List<BusinessService>  businessServices = businessServiceRepository.findAllByBusiness(business);
+        List<BusinessService> businessServices = businessServiceRepository.findAllByBusiness(business);
         List<BusinessServiceJSON> businessServiceJSONS = new ArrayList<>();
-        for(BusinessService businessService : businessServices)
-        {
+        for (BusinessService businessService : businessServices) {
             businessServiceJSONS.add(makeBusinessServiceJson(businessService));
         }
 
@@ -123,11 +122,9 @@ public class BusinessServiceService {
 
 
     @Transactional
-    public void delete(String businessServiceCode, Language language, int version) throws GeneralSecurityException {
+    public void delete(String businessServiceCode, Language language) throws GeneralSecurityException {
 
-        final boolean encrypted = (version == 0);
-
-        businessServiceCode  = encrypted ? Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value()) : businessServiceCode;
+        businessServiceCode = Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value());
 
         businessServiceRepository.deleteByBusinessServiceCode(businessServiceCode);
     }

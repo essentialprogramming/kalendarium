@@ -32,4 +32,10 @@ public class BusinessUnit {
     @Column(name = "name")
     private String name;
 
+    @ManyToMany
+    @JoinTable(
+            name = "businessservicebusinessunit",
+            joinColumns = @JoinColumn(name = "businessunitid"),
+            inverseJoinColumns = @JoinColumn(name = "businessserviceid"))
+    List<BusinessService> servicesPerformedByUnit;
 }

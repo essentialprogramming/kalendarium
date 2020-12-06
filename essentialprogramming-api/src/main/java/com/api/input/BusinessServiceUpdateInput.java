@@ -12,9 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BusinessServiceInput {
-
-    private String businessCode;
+public class BusinessServiceUpdateInput {
     private String name;
     private long duration;
     private String startTime;

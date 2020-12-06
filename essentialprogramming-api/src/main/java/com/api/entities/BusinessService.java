@@ -1,6 +1,7 @@
 package com.api.entities;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity(name = "businessservice")
 @Table(name = "businessservice")
+@DynamicUpdate
 public class BusinessService {
 
     @Id
@@ -38,5 +40,12 @@ public class BusinessService {
 
     @Column(name = "name")
     private String name;
+
+    @ManyToMany
+    @JoinTable(
+            name = "businessservicebusinessunit",
+            joinColumns = @JoinColumn(name = "businessserviceid"),
+            inverseJoinColumns = @JoinColumn(name = "businessunitid"))
+    List<BusinessUnit> unitsPerformingService;
 
 }

@@ -1,16 +1,16 @@
 package com.api.entities.enums;
 
 public enum AppointmentStatus {
-    PENDING("P"),
-    ACCEPTED("A");
+    PENDING(1),
+    ACCEPTED(2);
 
-    private String code;
+    private int code;
 
-    private AppointmentStatus(String code) {
+    private AppointmentStatus(int code) {
         this.code = code;
     }
 
-    public String getCode() {
+    public int getCode() {
         return code;
     }
 }
