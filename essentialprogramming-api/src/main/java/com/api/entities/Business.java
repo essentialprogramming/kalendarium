@@ -35,7 +35,6 @@ public class Business {
     @Column(name = "email")
     private String email;
 
-
     @Column(name = "businesscode")
     private String businessCode;
 
