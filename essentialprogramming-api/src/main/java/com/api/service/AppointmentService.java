@@ -82,6 +82,42 @@ public class AppointmentService {
             businessUnit = businessUnitRepository.findByBusinessUnitCode(businessUnitCode).orElseThrow(
                     () -> new ApiException(Messages.get("BUSINESSUNIT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
             );
+
+            boolean availableBusinessUnit = businessUnit.getAppointments().stream().allMatch(appointment -> {
+                if (businessService.getServiceDetail().getStartTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
+                        businessService.getServiceDetail().getStartTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
+                    return false;
+                }
+                if (businessService.getServiceDetail().getEndTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
+                        businessService.getServiceDetail().getEndTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
+                    return false;
+                }
+                return true;
+            });
+
+            // if the business unit that the user selected is not available a random business unit will be chosen
+            if (availableBusinessUnit) {
+                businessUnit = businessUnitRepository
+                        .findAll()
+                        .stream()
+                        .filter(businessUnit1 -> {
+                            return businessUnit1.getAppointments().stream().allMatch(appointment -> {
+                                if (businessService.getServiceDetail().getStartTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
+                                        businessService.getServiceDetail().getStartTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
+                                    return false;
+                                }
+                                if (businessService.getServiceDetail().getEndTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
+                                        businessService.getServiceDetail().getEndTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
+                                    return false;
+                                }
+                                return true;
+                            });
+                        })
+                        .findFirst().orElseThrow(
+                                () -> new ApiException(Messages.get("BUSINESSUNIT.NOT.AVAILABLE", language), HTTPCustomStatus.UNAUTHORIZED)
+                        );
+            }
+
         } else {
             // the search for an available business unit will stop when one available unit is found
             businessUnit = businessUnitRepository
