@@ -95,26 +95,15 @@ public class AppointmentService {
                     .stream()
                     .filter(businessUnit1 -> {
                         return businessUnit1.getAppointments().stream().allMatch(appointment -> {
-                            if (!appointment.getBusinessService().getServiceDetail().getDate().isEqual(businessService.getServiceDetail().getDate())) {
-                                return true;
+                            if (businessService.getServiceDetail().getStartTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
+                                    businessService.getServiceDetail().getStartTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
+                                return false;
                             }
-                            if (appointment.getBusinessService().getServiceDetail().getStartTime().plus(
-                                    appointment.getBusinessService().getServiceDetail().getDuration(),
-                                    ChronoUnit.MINUTES).isAfter(businessService.getServiceDetail().getStartTime().plus(
-                                    businessService.getServiceDetail().getDuration(),
-                                    ChronoUnit.MINUTES
-                            ))) {
-                                return true;
+                            if (businessService.getServiceDetail().getEndTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
+                                    businessService.getServiceDetail().getEndTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
+                                return false;
                             }
-                            if (appointment.getBusinessService().getServiceDetail().getStartTime().plus(
-                                    appointment.getBusinessService().getServiceDetail().getDuration(),
-                                    ChronoUnit.MINUTES).isBefore(businessService.getServiceDetail().getStartTime().plus(
-                                    businessService.getServiceDetail().getDuration(),
-                                    ChronoUnit.MINUTES
-                            ))) {
-                                return true;
-                            }
-                            return false;
+                            return true;
                         });
                     })
                     .findFirst().orElseThrow(
