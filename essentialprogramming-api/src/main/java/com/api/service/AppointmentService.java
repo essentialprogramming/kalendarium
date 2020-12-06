@@ -4,21 +4,18 @@ import com.api.entities.*;
 import com.api.entities.BusinessService;
 import com.api.input.AppointmentInput;
 import com.api.mapper.AppointmentMapper;
-import com.api.mapper.BusinessUnitMapper;
 import com.api.output.AppointmentJSON;
-import com.api.output.BusinessUnitJSON;
 import com.api.repository.*;
 import com.crypto.Crypt;
 import com.internationalization.Messages;
 import com.util.enums.HTTPCustomStatus;
 import com.util.enums.Language;
 import com.util.exceptions.ApiException;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.transaction.Transactional;
 import java.security.GeneralSecurityException;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -52,25 +49,22 @@ public class AppointmentService {
     }
 
     @Transactional
-    public void save(String email, AppointmentInput appointmentInput, Language language, int version) throws GeneralSecurityException {
-        final boolean encrypted = (version == 0);
-
+    public AppointmentJSON save(String email, AppointmentInput appointmentInput, Language language) throws GeneralSecurityException {
         String businessCode = appointmentInput.getBusinessCode();
-        businessCode  = encrypted ? Crypt.decrypt(businessCode, ENCRYPTION_KEY.value()) : businessCode;
+        businessCode  = Crypt.decrypt(businessCode, ENCRYPTION_KEY.value());
 
         Business business = businessRepository.findByBusinessCode(businessCode).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESS.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
         );
 
         String businessServiceCode = appointmentInput.getBusinessServiceCode();
-        businessServiceCode  = encrypted ? Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value()) : businessServiceCode;
+        businessServiceCode  = Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value());
 
         BusinessService businessService = businessServiceRepository.findByBusinessServiceCode(businessServiceCode).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
         );
 
         String userKey = appointmentInput.getUserKey();
-        userKey  = encrypted ? Crypt.decrypt(userKey, ENCRYPTION_KEY.value()) : userKey;
 
         User user = userRepository.findByUserKey(userKey).orElseThrow(
                 () -> new ApiException(Messages.get("USER.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
@@ -83,7 +77,7 @@ public class AppointmentService {
         // if a business unit is not provided we select a random available unit and we create the link between the unit and the appointment
         if (!appointmentInput.getBusinessUnitCode().equals("")) {
             businessUnitCode = appointmentInput.getBusinessUnitCode();
-            businessUnitCode = encrypted ? Crypt.decrypt(businessUnitCode, ENCRYPTION_KEY.value()) : businessUnitCode;
+            businessUnitCode = Crypt.decrypt(businessUnitCode, ENCRYPTION_KEY.value());
 
             businessUnit = businessUnitRepository.findByBusinessUnitCode(businessUnitCode).orElseThrow(
                     () -> new ApiException(Messages.get("BUSINESSUNIT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
@@ -122,13 +116,13 @@ public class AppointmentService {
         businessUnit.getAppointments().add(appointment);
 
         appointmentRepository.save(appointment);
+
+        return AppointmentMapper.appointmentToOutput(appointment);
     }
 
     @Transactional
-    public void update(String code, AppointmentInput appointmentInput, Language language, int version) throws GeneralSecurityException {
-        final boolean encrypted = (version == 0);
-
-        code  = encrypted ? Crypt.decrypt(code, ENCRYPTION_KEY.value()) : code;
+    public void update(String code, AppointmentInput appointmentInput, Language language) throws GeneralSecurityException {
+        code  = Crypt.decrypt(code, ENCRYPTION_KEY.value());
 
         Appointment appointment = appointmentRepository.findByAppointmentCode(code).orElseThrow(
                 () -> new ApiException(Messages.get("APPOINTMENT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
@@ -140,11 +134,7 @@ public class AppointmentService {
     }
 
     @Transactional
-    public List<AppointmentJSON> loadByUser(String userKey, Language language, int version) throws GeneralSecurityException {
-        final boolean encrypted = (version == 0);
-
-        userKey  = encrypted ? Crypt.decrypt(userKey, ENCRYPTION_KEY.value()) : userKey;
-
+    public List<AppointmentJSON> loadByUser(String userKey, Language language) throws GeneralSecurityException {
         User user = userRepository.findByUserKey(userKey).orElseThrow(
                 () -> new ApiException(Messages.get("USER.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
         );
@@ -152,16 +142,16 @@ public class AppointmentService {
         List<Appointment>  appointments = appointmentRepository.findAllByUser(user);
         List<AppointmentJSON> appointmentJSONS = new ArrayList<>();
 
-        appointments.forEach(appointment -> appointmentJSONS.add(AppointmentMapper.appointmentToOutput(appointment)));
+        for (Appointment appointment : appointments) {
+            appointmentJSONS.add(AppointmentMapper.appointmentToOutput(appointment));
+        }
 
         return appointmentJSONS;
     }
 
     @Transactional
-    public List<AppointmentJSON> loadByBusiness(String businessCode, Language language, int version) throws GeneralSecurityException {
-        final boolean encrypted = (version == 0);
-
-        businessCode  = encrypted ? Crypt.decrypt(businessCode, ENCRYPTION_KEY.value()) : businessCode;
+    public List<AppointmentJSON> loadByBusiness(String businessCode, Language language) throws GeneralSecurityException {
+        businessCode  = Crypt.decrypt(businessCode, ENCRYPTION_KEY.value());
 
         Business business = businessRepository.findByBusinessCode(businessCode).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESS.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
@@ -170,16 +160,15 @@ public class AppointmentService {
         List<Appointment>  appointments = appointmentRepository.findAllByBusiness(business);
         List<AppointmentJSON> appointmentJSONS = new ArrayList<>();
 
-        appointments.forEach(appointment -> appointmentJSONS.add(AppointmentMapper.appointmentToOutput(appointment)));
-
+        for (Appointment appointment : appointments) {
+            appointmentJSONS.add(AppointmentMapper.appointmentToOutput(appointment));
+        }
         return appointmentJSONS;
     }
 
     @Transactional
-    public List<AppointmentJSON> loadByBusinessUnit(String businessUnitCode, Language language, int version) throws GeneralSecurityException {
-        final boolean encrypted = (version == 0);
-
-        businessUnitCode  = encrypted ? Crypt.decrypt(businessUnitCode, ENCRYPTION_KEY.value()) : businessUnitCode;
+    public List<AppointmentJSON> loadByBusinessUnit(String businessUnitCode, Language language) throws GeneralSecurityException {
+        businessUnitCode  = Crypt.decrypt(businessUnitCode, ENCRYPTION_KEY.value());
 
         BusinessUnit businessUnit = businessUnitRepository.findByBusinessUnitCode(businessUnitCode).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESSUNIT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
@@ -188,16 +177,15 @@ public class AppointmentService {
         List<Appointment>  appointments = appointmentRepository.findAllByBusinessUnit(businessUnit);
         List<AppointmentJSON> appointmentJSONS = new ArrayList<>();
 
-        appointments.forEach(appointment -> appointmentJSONS.add(AppointmentMapper.appointmentToOutput(appointment)));
-
+        for (Appointment appointment : appointments) {
+            appointmentJSONS.add(AppointmentMapper.appointmentToOutput(appointment));
+        }
         return appointmentJSONS;
     }
 
     @Transactional
-    public List<AppointmentJSON> loadByBusinessService(String businessServiceCode, Language language, int version) throws GeneralSecurityException {
-        final boolean encrypted = (version == 0);
-
-        businessServiceCode  = encrypted ? Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value()) : businessServiceCode;
+    public List<AppointmentJSON> loadByBusinessService(String businessServiceCode, Language language) throws GeneralSecurityException {
+        businessServiceCode  = Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value());
 
         BusinessService businessService = businessServiceRepository.findByBusinessServiceCode(businessServiceCode).orElseThrow(
                 () -> new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
@@ -206,17 +194,15 @@ public class AppointmentService {
         List<Appointment>  appointments = appointmentRepository.findAllByBusinessService(businessService);
         List<AppointmentJSON> appointmentJSONS = new ArrayList<>();
 
-        appointments.forEach(appointment -> appointmentJSONS.add(AppointmentMapper.appointmentToOutput(appointment)));
-
+        for (Appointment appointment : appointments) {
+            appointmentJSONS.add(AppointmentMapper.appointmentToOutput(appointment));
+        }
         return appointmentJSONS;
     }
 
     @Transactional
-    public void delete(String appointmentCode, Language language, int version) throws GeneralSecurityException {
-
-        final boolean encrypted = (version == 0);
-
-        appointmentCode  = encrypted ? Crypt.decrypt(appointmentCode, ENCRYPTION_KEY.value()) : appointmentCode;
+    public void delete(String appointmentCode, Language language) throws GeneralSecurityException {
+        appointmentCode  = Crypt.decrypt(appointmentCode, ENCRYPTION_KEY.value());
 
         appointmentRepository.deleteByAppointmentCode(appointmentCode);
     }

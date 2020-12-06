@@ -61,21 +61,20 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json"
                             ))
             })
-    public void create(@HeaderParam("Authorization") String authorization, AppointmentInput appointmentInput, @DefaultValue("0") @QueryParam("v") int version, @Suspended AsyncResponse asyncResponse) {
+    public void create(@HeaderParam("Authorization") String authorization, AppointmentInput appointmentInput, @Suspended AsyncResponse asyncResponse) {
         final String bearer = AuthUtils.extractBearerToken(authorization);
         final String email = AuthUtils.getClaim(bearer, "email");
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> create(email, appointmentInput, version), executorService)
+        Computation.computeAsync(() -> create(email, appointmentInput), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
 
-    private Serializable create(String email, AppointmentInput appointmentInput, int version) throws ApiException {
+    private Serializable create(String email, AppointmentInput appointmentInput) throws ApiException {
         try {
             UserJSON user = userService.loadUser(email, language);
-            appointmentService.save(email, appointmentInput, language, version);
-            return TRUE;
+            return appointmentService.save(email, appointmentInput, language);
         } catch (ApiException e) {
             LOG.error("An error occurred while saving a new appointment.", e);
             throw e;
@@ -95,10 +94,10 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void loadByUser(@PathParam("user-key") String userKey, @DefaultValue("0") @QueryParam("v") int version, @Suspended AsyncResponse asyncResponse) {
+    public void loadByUser(@PathParam("user-key") String userKey, @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> appointmentService.loadByUser(userKey, language, version), executorService)
+        Computation.computeAsync(() -> appointmentService.loadByUser(userKey, language), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
@@ -113,10 +112,10 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void loadByBusiness(@PathParam("business-code") String businessCode, @DefaultValue("0") @QueryParam("v") int version, @Suspended AsyncResponse asyncResponse) {
+    public void loadByBusiness(@PathParam("business-code") String businessCode, @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> appointmentService.loadByBusiness(businessCode, language, version), executorService)
+        Computation.computeAsync(() -> appointmentService.loadByBusiness(businessCode, language), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
@@ -131,10 +130,10 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void loadByBusinessService(@PathParam("business-service-code") String businessServiceCode, @DefaultValue("0") @QueryParam("v") int version, @Suspended AsyncResponse asyncResponse) {
+    public void loadByBusinessService(@PathParam("business-service-code") String businessServiceCode, @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> appointmentService.loadByBusinessService(businessServiceCode, language, version), executorService)
+        Computation.computeAsync(() -> appointmentService.loadByBusinessService(businessServiceCode, language), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
@@ -149,10 +148,10 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void loadByBusinessUnit(@PathParam("business-unit-code") String businessUnitCode, @DefaultValue("0") @QueryParam("v") int version, @Suspended AsyncResponse asyncResponse) {
+    public void loadByBusinessUnit(@PathParam("business-unit-code") String businessUnitCode, @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> appointmentService.loadByBusinessUnit(businessUnitCode, language, version), executorService)
+        Computation.computeAsync(() -> appointmentService.loadByBusinessUnit(businessUnitCode, language), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
@@ -167,16 +166,16 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void update(@PathParam("appointment-code") String appointmentCode, @DefaultValue("0") @QueryParam("v") int version, AppointmentInput appointmentInput, @Suspended AsyncResponse asyncResponse) {
+    public void update(@PathParam("appointment-code") String appointmentCode, AppointmentInput appointmentInput, @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> update(appointmentCode, appointmentInput, version), executorService)
+        Computation.computeAsync(() -> update(appointmentCode, appointmentInput), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
 
-    private Serializable update(String appointmentCode, AppointmentInput appointmentInput, int version) throws ApiException, GeneralSecurityException {
-        appointmentService.update(appointmentCode, appointmentInput, language, version);
+    private Serializable update(String appointmentCode, AppointmentInput appointmentInput) throws ApiException, GeneralSecurityException {
+        appointmentService.update(appointmentCode, appointmentInput, language);
         return TRUE;
     }
 
@@ -190,16 +189,16 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void delete(@PathParam("appointment-code") String appointmentCode,  @DefaultValue("0") @QueryParam("v") int version,  @Suspended AsyncResponse asyncResponse) {
+    public void delete(@PathParam("appointment-code") String appointmentCode,  @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> delete(appointmentCode, version), executorService)
+        Computation.computeAsync(() -> delete(appointmentCode), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
 
-    private Serializable delete(String appointmentCode, int version) throws ApiException, GeneralSecurityException {
-        appointmentService.delete(appointmentCode, language, version);
+    private Serializable delete(String appointmentCode) throws ApiException, GeneralSecurityException {
+        appointmentService.delete(appointmentCode, language);
         return TRUE;
     }
 }
