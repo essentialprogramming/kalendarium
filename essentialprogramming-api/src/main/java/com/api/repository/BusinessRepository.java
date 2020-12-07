@@ -20,23 +20,21 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
 
     Optional<Business> findByBusinessCodeAndDeleted(@Param("businessCode") String businessCode, @Param("deleted") boolean deleted);
 
-    @Query(value = "select *\n" +
+    @Query(value = "select b\n" +
             "from business b\n" +
-            "where b.name like %?1% or b.businessid in\n" +
+            "where lower(b.name) like lower(concat('%',?1, '%')) or b.id in\n" +
             "    (\n" +
-            "        select bu.businessid\n" +
+            "        select bu.business\n" +
             "        from businessunit bu\n" +
-            "        where bu.name like %?1%\n" +
-            "        ) or b.businessid in \n" +
+            "        where lower(bu.name) like lower(concat('%',?1,'%')) \n" +
+            "        ) or b.id in \n" +
             "            (\n" +
-            "                select bs.businessid\n" +
+            "                select bs.business\n" +
             "                from businessservice bs\n" +
-            "                where bs.name like %?1%\n" +
-            "                ) or b.businessid in \n" +
-            "                    (\n" +
-            "                        select u.employer\n" +
-            "                        from \"user\" u \n" +
-            "                        where u.firstname like %?1% or u.lastname like %?1%\n" +
-            "                        )", nativeQuery = true)
+            "                where lower(bs.name) like lower(concat('%',?1,'%')) \n" +
+            "                ) or b.id in (select u.employer\n" +
+            "                        from user u \n" +
+            "                        where lower(u.firstName) like lower(concat('%',?1,'%')) or lower(u.lastName) like lower(concat('%',?1,'%')) \n" +
+            "                        )")
     List<Business> findAllBusinessByCriteria(String search);
 }
