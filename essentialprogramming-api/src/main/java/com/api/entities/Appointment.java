@@ -1,9 +1,11 @@
 package com.api.entities;
 
 import com.api.entities.enums.AppointmentStatus;
+import com.api.entities.enums.Day;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalTime;
 
 @Builder
 @Getter
@@ -44,5 +46,14 @@ public class Appointment {
 
     @Column(name = "appointmentcode")
     private String appointmentCode;
+
+    @Column(name = "endtime")
+    private LocalTime endTime;
+
+    @Column(name = "starttime")
+    private LocalTime startTime;
+
+    @Column(name = "day")
+    private Day day;
 
 }

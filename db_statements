@@ -48,7 +48,10 @@ create table if not exists public."appointment"(
   businessunitid smallint DEFAULT NULL,
   businessserviceid smallint DEFAULT NULL,
   userid smallint DEFAULT NULL,
-  status smallint DEFAULT NULL
+  status smallint DEFAULT NULL,
+  endtime timestamp DEFAULT NULL,
+  starttime timestamp DEFAULT NULL,
+  day smallint DEFAULT NULL
 );
 
 create table if not exists public."address"(

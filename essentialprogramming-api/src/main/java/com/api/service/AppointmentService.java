@@ -2,6 +2,7 @@ package com.api.service;
 
 import com.api.entities.*;
 import com.api.entities.BusinessService;
+import com.api.entities.enums.Day;
 import com.api.input.AppointmentInput;
 import com.api.mapper.AppointmentMapper;
 import com.api.output.AppointmentJSON;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.transaction.Transactional;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -73,6 +76,15 @@ public class AppointmentService {
         String businessUnitCode = "";
         BusinessUnit businessUnit = null;
 
+        Appointment app = AppointmentMapper.inputToAppointment(appointmentInput);
+
+        // if the day/start time/end time do not correspond with the ones in the business service then we can't create the appointment
+        if (!businessService.getServiceDetail().getDay().contains(appointmentInput.getDay()) ||
+                businessService.getServiceDetail().getStartTime().isAfter(app.getStartTime()) ||
+                businessService.getServiceDetail().getEndTime().isBefore(app.getEndTime())) {
+            throw  new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED);
+        }
+
         // if a business unit is provided we create the link between the unit and the appointment
         // if a business unit is not provided we select a random available unit and we create the link between the unit and the appointment
         if (!appointmentInput.getBusinessUnitCode().equals("")) {
@@ -84,32 +96,52 @@ public class AppointmentService {
             );
 
             boolean availableBusinessUnit = businessUnit.getAppointments().stream().allMatch(appointment -> {
-                if (businessService.getServiceDetail().getStartTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
-                        businessService.getServiceDetail().getStartTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
-                    return false;
+                Day day = appointment.getDay();
+                LocalTime start = appointment.getStartTime();
+                LocalTime end = appointment.getEndTime();
+
+                if (day.equals(app.getDay())) {
+                    if (start.equals(app.getStartTime()) && end.equals(app.getEndTime())) {
+                        return false;
+                    }
+
+                    if (app.getStartTime().isAfter(start) && app.getStartTime().isBefore(end)) {
+                        return false;
+                    }
+
+                    if (app.getEndTime().isAfter(start) && app.getEndTime().isBefore(end)) {
+                        return false;
+                    }
                 }
-                if (businessService.getServiceDetail().getEndTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
-                        businessService.getServiceDetail().getEndTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
-                    return false;
-                }
+
                 return true;
             });
 
             // if the business unit that the user selected is not available a random business unit will be chosen
-            if (availableBusinessUnit) {
+            if (!availableBusinessUnit) {
                 businessUnit = businessUnitRepository
                         .findAll()
                         .stream()
                         .filter(businessUnit1 -> {
                             return businessUnit1.getAppointments().stream().allMatch(appointment -> {
-                                if (businessService.getServiceDetail().getStartTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
-                                        businessService.getServiceDetail().getStartTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
-                                    return false;
+                                Day day = appointment.getDay();
+                                LocalTime start = appointment.getStartTime();
+                                LocalTime end = appointment.getEndTime();
+
+                                if (day.equals(app.getDay())) {
+                                    if (start.equals(app.getStartTime()) && end.equals(app.getEndTime())) {
+                                        return false;
+                                    }
+
+                                    if (app.getStartTime().isAfter(start) && app.getStartTime().isBefore(end)) {
+                                        return false;
+                                    }
+
+                                    if (app.getEndTime().isAfter(start) && app.getEndTime().isBefore(end)) {
+                                        return false;
+                                    }
                                 }
-                                if (businessService.getServiceDetail().getEndTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
-                                        businessService.getServiceDetail().getEndTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
-                                    return false;
-                                }
+
                                 return true;
                             });
                         })
@@ -125,14 +157,24 @@ public class AppointmentService {
                     .stream()
                     .filter(businessUnit1 -> {
                         return businessUnit1.getAppointments().stream().allMatch(appointment -> {
-                            if (businessService.getServiceDetail().getStartTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
-                                    businessService.getServiceDetail().getStartTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
-                                return false;
+                            Day day = appointment.getDay();
+                            LocalTime start = appointment.getStartTime();
+                            LocalTime end = appointment.getEndTime();
+
+                            if (day.equals(app.getDay())) {
+                                if (start.equals(app.getStartTime()) && end.equals(app.getEndTime())) {
+                                    return false;
+                                }
+
+                                if (app.getStartTime().isAfter(start) && app.getStartTime().isBefore(end)) {
+                                    return false;
+                                }
+
+                                if (app.getEndTime().isAfter(start) && app.getEndTime().isBefore(end)) {
+                                    return false;
+                                }
                             }
-                            if (businessService.getServiceDetail().getEndTime().isAfter(appointment.getBusinessService().getServiceDetail().getStartTime()) &&
-                                    businessService.getServiceDetail().getEndTime().isBefore(appointment.getBusinessService().getServiceDetail().getEndTime())) {
-                                return false;
-                            }
+
                             return true;
                         });
                     })
@@ -142,18 +184,17 @@ public class AppointmentService {
         }
 
 
-        Appointment appointment = AppointmentMapper.inputToAppointment(appointmentInput);
-        appointment.setUser(user);
-        appointment.setBusiness(business);
-        appointment.setBusinessUnit(businessUnit);
-        appointment.setBusinessService(businessService);
-        appointment.setAppointmentCode(getComplexUUID());
+        app.setUser(user);
+        app.setBusiness(business);
+        app.setBusinessUnit(businessUnit);
+        app.setBusinessService(businessService);
+        app.setAppointmentCode(getComplexUUID());
 
-        businessUnit.getAppointments().add(appointment);
+        businessUnit.getAppointments().add(app);
 
-        appointmentRepository.save(appointment);
+        appointmentRepository.save(app);
 
-        return AppointmentMapper.appointmentToOutput(appointment);
+        return AppointmentMapper.appointmentToOutput(app);
     }
 
     @Transactional
