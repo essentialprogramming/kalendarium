@@ -2,13 +2,18 @@ package com.api.service;
 
 import com.api.entities.*;
 import com.api.entities.BusinessService;
+import com.api.entities.enums.AppointmentStatus;
 import com.api.entities.enums.Day;
 import com.api.input.AppointmentInput;
 import com.api.mapper.AppointmentMapper;
 import com.api.output.AppointmentJSON;
 import com.api.repository.*;
 import com.crypto.Crypt;
+import com.email.EmailTemplateService;
+import com.email.Template;
+import com.internationalization.EmailMessages;
 import com.internationalization.Messages;
+import com.resources.AppResources;
 import com.util.enums.HTTPCustomStatus;
 import com.util.enums.Language;
 import com.util.exceptions.ApiException;
@@ -17,11 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.transaction.Transactional;
 import java.security.GeneralSecurityException;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.resources.AppResources.ENCRYPTION_KEY;
 
@@ -34,17 +37,21 @@ public class AppointmentService {
     private BusinessServiceRepository businessServiceRepository;
     private UserRepository userRepository;
 
+    private final EmailTemplateService emailTemplateService;
+
+
     @Autowired
     public AppointmentService(AppointmentRepository appointmentRepository,
                               BusinessRepository businessRepository,
                               BusinessUnitRepository businessUnitRepository,
                               BusinessServiceRepository businessServiceRepository,
-                              UserRepository userRepository) {
+                              UserRepository userRepository, EmailTemplateService emailTemplateService) {
         this.appointmentRepository = appointmentRepository;
         this.businessRepository = businessRepository;
         this.businessUnitRepository = businessUnitRepository;
         this.businessServiceRepository = businessServiceRepository;
         this.userRepository = userRepository;
+        this.emailTemplateService = emailTemplateService;
     }
 
     private String getComplexUUID() {
@@ -95,60 +102,60 @@ public class AppointmentService {
                     () -> new ApiException(Messages.get("BUSINESSUNIT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
             );
 
-            boolean availableBusinessUnit = businessUnit.getAppointments().stream().allMatch(appointment -> {
-                Day day = appointment.getDay();
-                LocalTime start = appointment.getStartTime();
-                LocalTime end = appointment.getEndTime();
-
-                if (day.equals(app.getDay())) {
-                    if (start.equals(app.getStartTime()) && end.equals(app.getEndTime())) {
-                        return false;
-                    }
-
-                    if (app.getStartTime().isAfter(start) && app.getStartTime().isBefore(end)) {
-                        return false;
-                    }
-
-                    if (app.getEndTime().isAfter(start) && app.getEndTime().isBefore(end)) {
-                        return false;
-                    }
-                }
-
-                return true;
-            });
+//            boolean availableBusinessUnit = businessUnit.getAppointments().stream().allMatch(appointment -> {
+//                Day day = appointment.getDay();
+//                LocalTime start = appointment.getStartTime();
+//                LocalTime end = appointment.getEndTime();
+//
+//                if (day.equals(app.getDay())) {
+//                    if (start.equals(app.getStartTime()) && end.equals(app.getEndTime())) {
+//                        return false;
+//                    }
+//
+//                    if (app.getStartTime().isAfter(start) && app.getStartTime().isBefore(end)) {
+//                        return false;
+//                    }
+//
+//                    if (app.getEndTime().isAfter(start) && app.getEndTime().isBefore(end)) {
+//                        return false;
+//                    }
+//                }
+//
+//                return true;
+//            });
 
             // if the business unit that the user selected is not available a random business unit will be chosen
-            if (!availableBusinessUnit) {
-                businessUnit = businessUnitRepository
-                        .findAll()
-                        .stream()
-                        .filter(businessUnit1 -> {
-                            return businessUnit1.getAppointments().stream().allMatch(appointment -> {
-                                Day day = appointment.getDay();
-                                LocalTime start = appointment.getStartTime();
-                                LocalTime end = appointment.getEndTime();
-
-                                if (day.equals(app.getDay())) {
-                                    if (start.equals(app.getStartTime()) && end.equals(app.getEndTime())) {
-                                        return false;
-                                    }
-
-                                    if (app.getStartTime().isAfter(start) && app.getStartTime().isBefore(end)) {
-                                        return false;
-                                    }
-
-                                    if (app.getEndTime().isAfter(start) && app.getEndTime().isBefore(end)) {
-                                        return false;
-                                    }
-                                }
-
-                                return true;
-                            });
-                        })
-                        .findFirst().orElseThrow(
-                                () -> new ApiException(Messages.get("BUSINESSUNIT.NOT.AVAILABLE", language), HTTPCustomStatus.UNAUTHORIZED)
-                        );
-            }
+//             if (!availableBusinessUnit) {
+//                businessUnit = businessUnitRepository
+//                        .findAll()
+//                        .stream()
+//                        .filter(businessUnit1 -> {
+//                            return businessUnit1.getAppointments().stream().allMatch(appointment -> {
+//                                Day day = appointment.getDay();
+//                                LocalTime start = appointment.getStartTime();
+//                                LocalTime end = appointment.getEndTime();
+//
+//                                if (day.equals(app.getDay())) {
+//                                    if (start.equals(app.getStartTime()) && end.equals(app.getEndTime())) {
+//                                        return false;
+//                                    }
+//
+//                                    if (app.getStartTime().isAfter(start) && app.getStartTime().isBefore(end)) {
+//                                        return false;
+//                                    }
+//
+//                                    if (app.getEndTime().isAfter(start) && app.getEndTime().isBefore(end)) {
+//                                        return false;
+//                                    }
+//                                }
+//
+//                                return true;
+//                            });
+//                        })
+//                        .findFirst().orElseThrow(
+//                                () -> new ApiException(Messages.get("BUSINESSUNIT.NOT.AVAILABLE", language), HTTPCustomStatus.UNAUTHORIZED)
+//                        );
+//            }
 
         } else {
             // the search for an available business unit will stop when one available unit is found
@@ -192,9 +199,104 @@ public class AppointmentService {
 
         boolean anotherAppointmentFound = false;
 
-        businessUnit.getAppointments().add(app);
+        List<Appointment> appointments = appointmentRepository.findAllByBusinessAndBusinessServiceAndBusinessUnitAndDayAndStartTimeAndEndTime(
+                business,
+                businessService,
+                businessUnit,
+                app.getDay(),
+                app.getStartTime(),
+                app.getEndTime()
+        );
 
-        appointmentRepository.save(app);
+        if (!appointments.isEmpty()) {
+            anotherAppointmentFound = true;
+        }
+
+        if (!anotherAppointmentFound) {
+            app.setStatus(AppointmentStatus.ACCEPTED);
+            businessUnit.getAppointments().add(app);
+            appointmentRepository.save(app);
+        } else {
+            app.setStatus(AppointmentStatus.PENDING);
+            businessUnit.getAppointments().add(app);
+            appointmentRepository.save(app);
+        }
+
+        return AppointmentMapper.appointmentToOutput(app);
+    }
+
+    @Transactional
+    public AppointmentJSON updateStatus(String email, AppointmentInput appointmentInput, Language language) throws GeneralSecurityException {
+        String businessCode = appointmentInput.getBusinessCode();
+        businessCode  = Crypt.decrypt(businessCode, ENCRYPTION_KEY.value());
+
+        Business business = businessRepository.findByBusinessCode(businessCode).orElseThrow(
+                () -> new ApiException(Messages.get("BUSINESS.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
+        );
+
+        String businessServiceCode = appointmentInput.getBusinessServiceCode();
+        businessServiceCode  = Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value());
+
+        BusinessService businessService = businessServiceRepository.findByBusinessServiceCode(businessServiceCode).orElseThrow(
+                () -> new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
+        );
+
+        String userKey = appointmentInput.getUserKey();
+
+        User user = userRepository.findByUserKey(userKey).orElseThrow(
+                () -> new ApiException(Messages.get("USER.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
+        );
+
+        String businessUnitCode = "";
+        BusinessUnit businessUnit = null;
+
+        Appointment app = AppointmentMapper.inputToAppointment(appointmentInput);
+
+        // if the day/start time/end time do not correspond with the ones in the business service then we can't create the appointment
+        if (!businessService.getServiceDetail().getDay().contains(appointmentInput.getDay()) ||
+                businessService.getServiceDetail().getStartTime().isAfter(app.getStartTime()) ||
+                businessService.getServiceDetail().getEndTime().isBefore(app.getEndTime())) {
+            throw  new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED);
+        }
+
+        businessUnitCode = appointmentInput.getBusinessUnitCode();
+        businessUnitCode = Crypt.decrypt(businessUnitCode, ENCRYPTION_KEY.value());
+
+        businessUnit = businessUnitRepository.findByBusinessUnitCode(businessUnitCode).orElseThrow(
+                () -> new ApiException(Messages.get("BUSINESSUNIT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
+        );
+
+        app.setUser(user);
+        app.setBusiness(business);
+        app.setBusinessUnit(businessUnit);
+        app.setBusinessService(businessService);
+        app.setAppointmentCode(getComplexUUID());
+
+        boolean anotherAppointmentFound = false;
+
+        List<Appointment> appointments = appointmentRepository.findAllByBusinessAndBusinessServiceAndBusinessUnitAndDayAndStartTimeAndEndTime(
+                business,
+                businessService,
+                businessUnit,
+                app.getDay(),
+                app.getStartTime(),
+                app.getEndTime()
+        );
+
+        if (!appointments.isEmpty()) {
+            anotherAppointmentFound = true;
+        }
+
+        if (anotherAppointmentFound) {
+            for (Appointment appointment :
+                appointments) {
+                if (appointment.getUser().equals(user)) {
+                    appointment.setStatus(AppointmentStatus.ACCEPTED);
+                    appointmentRepository.save(appointment);
+                    return AppointmentMapper.appointmentToOutput(appointment);
+                }
+            }
+        }
 
         return AppointmentMapper.appointmentToOutput(app);
     }
@@ -207,7 +309,12 @@ public class AppointmentService {
                 () -> new ApiException(Messages.get("APPOINTMENT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
         );
 
-        appointment.setStatus(appointmentInput.getStatus());
+        Appointment app = AppointmentMapper.inputToAppointment(appointmentInput);
+
+        appointment.setDate(app.getDate());
+        appointment.setDay(app.getDay());
+        appointment.setStartTime(app.getStartTime());
+        appointment.setEndTime(app.getEndTime());
 
         appointmentRepository.save(appointment);
     }
@@ -282,6 +389,34 @@ public class AppointmentService {
     @Transactional
     public void delete(String appointmentCode, Language language) throws GeneralSecurityException {
         appointmentCode  = Crypt.decrypt(appointmentCode, ENCRYPTION_KEY.value());
+
+        Appointment app = appointmentRepository.findByAppointmentCode(appointmentCode).orElseThrow(
+                () -> new ApiException(Messages.get("APPOINTMENT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
+        );
+
+        List<Appointment> appointments = appointmentRepository.findAllByBusinessAndBusinessServiceAndBusinessUnitAndDayAndStartTimeAndEndTime(
+                app.getBusiness(),
+                app.getBusinessService(),
+                app.getBusinessUnit(),
+                app.getDay(),
+                app.getStartTime(),
+                app.getEndTime()
+        ).stream().filter(appointment -> !appointment.getAppointmentCode().equals(app.getAppointmentCode())).collect(Collectors.toList());
+
+        appointments.forEach(appointment -> {
+            String validationKey = null;
+            try {
+                validationKey = Crypt.encrypt(appointment.getUser().getUserKey(), Crypt.encrypt(appointment.getUser().getUserKey(), appointment.getUser().getUserKey()));
+                String encryptedUserKey = Crypt.encrypt(appointment.getUser().getUserKey(), AppResources.ENCRYPTION_KEY.value());
+                Map<String, Object> templateKeysAndValues = new HashMap<>();
+                String url = AppResources.ACCOUNT_CONFIRMATION_URL.value() + "/" + validationKey + "/" + encryptedUserKey;
+                templateKeysAndValues.put("fullName", appointment.getUser().getFullName());
+                templateKeysAndValues.put("confirmationLink", url);
+                emailTemplateService.send(templateKeysAndValues, appointment.getUser().getEmail(), EmailMessages.get("appointment.subject", language.getLocale()), Template.APPOINTMENT_CONFIRMATION, language.getLocale());
+            } catch (GeneralSecurityException e) {
+                throw new ApiException(Messages.get("ENCRYPTION.FAILED", language), HTTPCustomStatus.UNAUTHORIZED);
+            }
+        });
 
         appointmentRepository.deleteByAppointmentCode(appointmentCode);
     }

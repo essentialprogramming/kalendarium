@@ -84,6 +84,39 @@ public class AppointmentController {
         }
     }
 
+    @POST
+    @Path("appointment/updateStatus")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Update Status for Appointment", tags = {"Appointment",},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Returns auth key if successfully added.",
+                            content = @Content(mediaType = "application/json"
+                            ))
+            })
+    public void updateStatus(@HeaderParam("Authorization") String authorization, AppointmentInput appointmentInput, @Suspended AsyncResponse asyncResponse) {
+        final String bearer = AuthUtils.extractBearerToken(authorization);
+        final String email = AuthUtils.getClaim(bearer, "email");
+
+        ExecutorService executorService = ExecutorsProvider.getExecutorService();
+        Computation.computeAsync(() -> updateStatus(email, appointmentInput), executorService)
+                .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
+                .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
+    }
+
+    private Serializable updateStatus(String email, AppointmentInput appointmentInput) throws ApiException {
+        try {
+            UserJSON user = userService.loadUser(email, language);
+            return appointmentService.updateStatus(email, appointmentInput, language);
+        } catch (ApiException e) {
+            LOG.error("An error occurred while saving a new appointment.", e);
+            throw e;
+        } catch (Exception e) {
+            LOG.error("An error occurred while saving a new appointment.", e);
+            throw new ApiException(Messages.get("APPOINTMENT.NOT.STORED", language), HTTPCustomStatus.BUSINESS_EXCEPTION);
+        }
+    }
+
     @GET
     @Path("appointment/load/user/{user-key}")
     @Consumes("application/json")

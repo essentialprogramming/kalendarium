@@ -28,7 +28,6 @@ public class AppointmentMapper {
         LocalDate date = dateString!=null ? LocalDate.parse(dateString, DATE_FORMATTER) : null;
 
         return Appointment.builder()
-                .status(appointmentInput.getStatus())
                 .endTime(end)
                 .startTime(start)
                 .day(appointmentInput.getDay())

@@ -23,7 +23,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Integer
 
     Optional<Appointment> findByAppointmentCode(String businessUnitCode);
 
-    Optional<Appointment> findByBusinessAndBusinessServiceAndDayAndStartTimeAndEndTime(Business business, BusinessService businessService, Day day, LocalTime startTime, LocalTime endTime);
+    List<Appointment> findAllByBusinessAndBusinessServiceAndBusinessUnitAndDayAndStartTimeAndEndTime(Business business, BusinessService businessService, BusinessUnit businessUnit, Day day, LocalTime startTime, LocalTime endTime);
 
     void deleteByAppointmentCode(String appointmentCode);
 

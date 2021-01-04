@@ -17,6 +17,14 @@ public enum AppResources {
         }
     },
     /**
+     * Url to be sent in the confirm appointment email.
+     */
+    APPOINTMENT_CONFIRMATION_URL {
+        public String value() {
+            return System.getenv().getOrDefault("APP_URL", configuration.getPropertyAsString("app.url")) + "/user/reservationlist";
+        }
+    },
+    /**
      * SendGrid Api Key.
      */
     SENDGRID_API_KEY {

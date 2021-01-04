@@ -1,0 +1,36 @@
+<div style="text-align: center;" th:fragment="appointment" xmlns:th="http://www.thymeleaf.org">
+    <!--    <p><h4 th:text="#{new_user.header.text}"></h4></p>-->
+    <!--    <br/>-->
+
+    <br/>
+    <br/>
+
+    <!--/*@thymesVar id="fullName" type="java.lang.String"*/-->
+    <strong style="text-align: center" th:text="${fullName} + ','"></strong>
+    <br/>
+    <br/>
+    <span style="text-align: center" th:text="#{appointment.info}"></span>
+
+    <br/>
+    <br/>
+    <div style="
+    text-align: center;">
+
+        <!--/*@thymesVar id="confirmationLink" type="java.lang.String"*/-->
+        <a href="#" th:href="${confirmationLink}" th:text="#{appointment.confirmappointment}" target="_other" rel="nofollow"
+           style="
+    background: #2c3333;
+    color: #69bdd2;
+    text-decoration: none;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 5px;
+    "></a>
+    </div>
+
+    <br/>
+    <br/>
+    <span style="text-align: center" th:text="#{appointment.regards}"></span>
+    <br/>
+    <span style="text-align: center" th:text="#{appointment.regards2}"></span>
+</div>
