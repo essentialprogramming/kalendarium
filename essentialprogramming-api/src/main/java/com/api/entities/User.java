@@ -64,10 +64,6 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employer")
-    private Business employer;
-
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<BusinessUsers> businessUsers;
 

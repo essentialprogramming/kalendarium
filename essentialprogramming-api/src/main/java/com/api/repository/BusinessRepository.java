@@ -32,9 +32,7 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
             "                select bs.business\n" +
             "                from businessservice bs\n" +
             "                where lower(bs.name) like lower(concat('%',?1,'%')) \n" +
-            "                ) or b.id in (select u.employer\n" +
-            "                        from user u \n" +
-            "                        where lower(u.firstName) like lower(concat('%',?1,'%')) or lower(u.lastName) like lower(concat('%',?1,'%')) \n" +
-            "                        )")
+            "                )")
+    //TODO - think a new way
     List<Business> findAllBusinessByCriteria(String search);
 }

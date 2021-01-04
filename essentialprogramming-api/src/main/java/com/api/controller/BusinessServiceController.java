@@ -3,6 +3,7 @@ package com.api.controller;
 import com.api.input.BusinessInput;
 import com.api.input.BusinessServiceInput;
 import com.api.input.BusinessServiceUpdateInput;
+import com.api.input.UserInput;
 import com.api.output.UserJSON;
 import com.api.service.BusinessServiceService;
 import com.api.service.UserService;
@@ -21,6 +22,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
@@ -148,5 +151,51 @@ public class BusinessServiceController {
     private Serializable delete(String businessServiceCode) throws ApiException, GeneralSecurityException {
         businessServiceService.delete(businessServiceCode, language);
         return TRUE;
+    }
+
+    @POST
+    @Path("business-service/addEmployee")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Add employee", tags = {"BusinessService",},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Returns auth key if successfully added.",
+                            content = @Content(mediaType = "application/json"
+                            ))
+            })
+    public void addEmployee(@HeaderParam("Authorization") String authorization, @RequestBody String employeeEmail, @Suspended AsyncResponse asyncResponse) {
+        final String bearer = AuthUtils.extractBearerToken(authorization);
+        final String email = AuthUtils.getClaim(bearer, "email");
+
+        ExecutorService executorService = ExecutorsProvider.getExecutorService();
+        Computation.computeAsync(() -> createEmployee(email, employeeEmail), executorService)
+                .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
+                .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
+    }
+
+    private Serializable createEmployee(String email, String employeeEmail) {
+        businessServiceService.addEmployee(email, employeeEmail);
+        return TRUE;
+    }
+
+    @GET
+    @Path("business-service/loadAllEmployees")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Load Users by business", tags = {"BusinessService",},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Returns business services.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)))
+            })
+    public void loadUsersByBusiness(@HeaderParam("Authorization") String authorization, @Suspended AsyncResponse asyncResponse) {
+
+        final String bearer = AuthUtils.extractBearerToken(authorization);
+        final String email = AuthUtils.getClaim(bearer, "email");
+
+        ExecutorService executorService = ExecutorsProvider.getExecutorService();
+        Computation.computeAsync(() -> businessServiceService.getAllEmployeesForBusiness(email), executorService)
+                .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
+                .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
 }
