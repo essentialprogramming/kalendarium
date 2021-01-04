@@ -22,6 +22,7 @@ public class AppointmentInput {
     private AppointmentStatus status;
     private String startTime;
     private String endTime;
+    private String date;
     private Day day;
 
 }

@@ -51,7 +51,8 @@ create table if not exists public."appointment"(
   status smallint DEFAULT NULL,
   endtime timestamp DEFAULT NULL,
   starttime timestamp DEFAULT NULL,
-  day smallint DEFAULT NULL
+  day smallint DEFAULT NULL,
+  date date DEFAULT NULL
 );
 
 create table if not exists public."address"(
