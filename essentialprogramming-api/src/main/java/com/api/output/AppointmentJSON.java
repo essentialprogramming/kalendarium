@@ -20,5 +20,6 @@ public class AppointmentJSON implements Serializable {
     private String start;
     private String end;
     private Day day;
+    private String date;
 
 }

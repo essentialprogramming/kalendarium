@@ -5,6 +5,7 @@ import com.api.entities.enums.Day;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Builder
@@ -55,5 +56,8 @@ public class Appointment {
 
     @Column(name = "day")
     private Day day;
+
+    @Column(name = "date")
+    private LocalDate date;
 
 }

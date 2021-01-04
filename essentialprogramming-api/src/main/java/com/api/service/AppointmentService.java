@@ -190,6 +190,8 @@ public class AppointmentService {
         app.setBusinessService(businessService);
         app.setAppointmentCode(getComplexUUID());
 
+        boolean anotherAppointmentFound = false;
+
         businessUnit.getAppointments().add(app);
 
         appointmentRepository.save(app);
