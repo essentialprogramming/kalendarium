@@ -170,5 +170,23 @@ public class BusinessController {
         return TRUE;
     }
 
+    @GET
+    @Path("business/search/{search}")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Load all businesses by some criteria", tags = {"Business",},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Returns businesses.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)))
+            })
+    public void loadAllByCriteria(@HeaderParam("Authorization") String authorization, @PathParam("search") String search, @Suspended AsyncResponse asyncResponse) {
 
+        final String bearer = AuthUtils.extractBearerToken(authorization);
+        final String email = AuthUtils.getClaim(bearer, "email");
+        ExecutorService executorService = ExecutorsProvider.getExecutorService();
+        Computation.computeAsync(() -> businessService.loadAllByCriteria(search), executorService)
+                .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
+                .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
+    }
 }
