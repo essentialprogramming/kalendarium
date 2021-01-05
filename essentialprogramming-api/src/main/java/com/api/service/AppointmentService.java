@@ -409,7 +409,7 @@ public class AppointmentService {
                 validationKey = Crypt.encrypt(appointment.getUser().getUserKey(), Crypt.encrypt(appointment.getUser().getUserKey(), appointment.getUser().getUserKey()));
                 String encryptedUserKey = Crypt.encrypt(appointment.getUser().getUserKey(), AppResources.ENCRYPTION_KEY.value());
                 Map<String, Object> templateKeysAndValues = new HashMap<>();
-                String url = AppResources.ACCOUNT_CONFIRMATION_URL.value() + "/" + validationKey + "/" + encryptedUserKey;
+                String url = AppResources.APPOINTMENT_CONFIRMATION_URL.value();
                 templateKeysAndValues.put("fullName", appointment.getUser().getFullName());
                 templateKeysAndValues.put("confirmationLink", url);
                 emailTemplateService.send(templateKeysAndValues, appointment.getUser().getEmail(), EmailMessages.get("appointment.subject", language.getLocale()), Template.APPOINTMENT_CONFIRMATION, language.getLocale());
