@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -43,19 +44,17 @@ public class UserService {
     @Transactional
     public UserJSON save(UserInput input, com.util.enums.Language language) throws GeneralSecurityException {
 
-        User user = UserMapper.inputToUser(input);
-        User result = saveUser(user, input, language);
+        User user = userRepository.findByEmail(input.getEmail())
+                .orElseThrow(() -> new ApiException(Messages.get("USER.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
+                );
+
+        user.setFirstName(input.getFirstName());
+        user.setLastName(input.getLastName());
+        user.setPhone(input.getPhone());
+        user.setModifiedDate(LocalDateTime.now());
+
+        User result = userRepository.save(user);
         user.setCreatedBy(result.getId());
-
-        String validationKey = Crypt.encrypt(result.getUserKey(), Crypt.encrypt(result.getUserKey(), result.getUserKey()));
-        String encryptedUserKey = Crypt.encrypt(user.getUserKey(), AppResources.ENCRYPTION_KEY.value());
-
-        String url = AppResources.ACCOUNT_CONFIRMATION_URL.value() + "/" + validationKey + "/" + encryptedUserKey;
-
-        Map<String, Object> templateKeysAndValues = new HashMap<>();
-        templateKeysAndValues.put("fullName", user.getFullName());
-        templateKeysAndValues.put("confirmationLink", url);
-        emailTemplateService.send(templateKeysAndValues, user.getEmail(), EmailMessages.get("new_user.subject", language.getLocale()), Template.NEW_USER, language.getLocale());
 
         return UserMapper.userToJson(result);
 

@@ -75,6 +75,30 @@ public class UserController {
             throw new ApiException(Messages.get("EMAIL.ALREADY.TAKEN", language), HTTPCustomStatus.BUSINESS_VALIDATION_ERROR);
     }
 
+    @POST
+    @Path("user/update")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Update user", tags = {"User",},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Return user if successfully updated",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = UserJSON.class)))
+            })
+    @Anonymous
+    public void updateUser(UserInput userInput, @Suspended AsyncResponse asyncResponse) {
+
+        ExecutorService executorService = ExecutorsProvider.getExecutorService();
+        Computation.computeAsync(() -> updateUser(userInput, language), executorService)
+                .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
+                .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
+
+    }
+
+    private Serializable updateUser(UserInput userInput, Language language) throws GeneralSecurityException, ApiException {
+            return userService.save(userInput, language);
+    }
+
 
 
     @GET
