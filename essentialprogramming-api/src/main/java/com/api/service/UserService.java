@@ -44,6 +44,27 @@ public class UserService {
     @Transactional
     public UserJSON save(UserInput input, com.util.enums.Language language) throws GeneralSecurityException {
 
+            User user = UserMapper.inputToUser(input);
+            User result = saveUser(user, input, language);
+            user.setCreatedBy(result.getId());
+
+            String validationKey = Crypt.encrypt(result.getUserKey(), Crypt.encrypt(result.getUserKey(), result.getUserKey()));
+            String encryptedUserKey = Crypt.encrypt(user.getUserKey(), AppResources.ENCRYPTION_KEY.value());
+
+
+            String url = AppResources.ACCOUNT_CONFIRMATION_URL.value() + "/" + validationKey + "/" + encryptedUserKey;
+
+            Map<String, Object> templateKeysAndValues = new HashMap<>();
+            templateKeysAndValues.put("fullName", user.getFullName());
+            templateKeysAndValues.put("confirmationLink", url);
+            emailTemplateService.send(templateKeysAndValues, user.getEmail(), EmailMessages.get("new_user.subject", language.getLocale()), Template.NEW_USER, language.getLocale());
+
+            return UserMapper.userToJson(result);
+    }
+
+    @Transactional
+    public UserJSON update(UserInput input, com.util.enums.Language language) throws GeneralSecurityException {
+
         User user = userRepository.findByEmail(input.getEmail())
                 .orElseThrow(() -> new ApiException(Messages.get("USER.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
                 );

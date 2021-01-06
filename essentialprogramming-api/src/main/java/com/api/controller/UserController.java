@@ -96,7 +96,7 @@ public class UserController {
     }
 
     private Serializable updateUser(UserInput userInput, Language language) throws GeneralSecurityException, ApiException {
-            return userService.save(userInput, language);
+            return userService.update(userInput, language);
     }
 
 
