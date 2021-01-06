@@ -131,7 +131,7 @@ public class BusinessServiceController {
 
 
     @POST
-    @Path("business-service/add")
+    @Path("business-service/add/business-service")
     @Consumes("application/json")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Add Business Unit to Business Service", tags = {"BusinessService",},
