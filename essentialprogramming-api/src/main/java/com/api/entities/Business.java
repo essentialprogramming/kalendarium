@@ -93,4 +93,12 @@ public class Business {
         businessHistories.add(businessHistory);
     }
 
+    public void addBusinessUnit(BusinessUnit businessUnit) {
+        businessUnits.add(businessUnit);
+    }
+
+    public void addBusinessService(BusinessService businessService) {
+        businessServices.add(businessService);
+    }
+
 }

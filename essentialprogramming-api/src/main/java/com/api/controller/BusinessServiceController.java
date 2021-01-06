@@ -1,9 +1,6 @@
 package com.api.controller;
 
-import com.api.input.BusinessServiceInput;
-import com.api.input.BusinessServiceScheduleInput;
-import com.api.input.BusinessServiceUpdateInput;
-import com.api.input.BusinessUnitServiceInput;
+import com.api.input.*;
 import com.api.service.BusinessServiceService;
 import com.api.service.UserService;
 import com.config.spring.ExecutorsProvider;
@@ -236,18 +233,18 @@ public class BusinessServiceController {
                             content = @Content(mediaType = "application/json"
                             ))
             })
-    public void addEmployee(@HeaderParam("Authorization") String authorization, @RequestBody String employeeEmail, @Suspended AsyncResponse asyncResponse) {
+    public void addEmployee(@HeaderParam("Authorization") String authorization, @RequestBody EmployeeInput employeeInput, @Suspended AsyncResponse asyncResponse) {
         final String bearer = AuthUtils.extractBearerToken(authorization);
         final String email = AuthUtils.getClaim(bearer, "email");
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> createEmployee(email, employeeEmail), executorService)
+        Computation.computeAsync(() -> createEmployee(email, employeeInput, language), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
 
-    private Serializable createEmployee(String email, String employeeEmail) {
-        businessServiceService.addEmployee(email, employeeEmail);
+    private Serializable createEmployee(String email, EmployeeInput employeeInput, Language language) throws GeneralSecurityException {
+        businessServiceService.addEmployee(email, employeeInput, language);
         return TRUE;
     }
 

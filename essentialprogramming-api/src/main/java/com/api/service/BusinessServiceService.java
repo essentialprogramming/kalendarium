@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.GeneralSecurityException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -146,7 +147,7 @@ public class BusinessServiceService {
 
         String businessServiceCode = Crypt.decrypt(businessServiceInput.getBusinessCode(), ENCRYPTION_KEY.value());
 
-        BusinessService businessService = businessServiceRepository.findByBusinessServiceCode(businessServiceCode).orElseThrow( () -> new ApiException(Messages.get("BUSINESS.SERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED));
+        BusinessService businessService = businessServiceRepository.findByBusinessServiceCode(businessServiceCode).orElseThrow(() -> new ApiException(Messages.get("BUSINESS.SERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED));
 
         ServiceDetail serviceDetail = businessService.getServiceDetail();
 
@@ -156,7 +157,7 @@ public class BusinessServiceService {
 
         Set<LocalTime> availableTime = new HashSet<>();
 
-        for(BusinessUnit businessUnit : businessUnits){
+        for (BusinessUnit businessUnit : businessUnits) {
             availableTime.addAll(getScheduleForBusinessUnit(businessUnit, serviceDetail, date));
         }
 
@@ -174,23 +175,22 @@ public class BusinessServiceService {
 
         LocalTime currentTime = serviceDetail.getStartTime();
         LocalTime endTime = serviceDetail.getEndTime();
-        while(currentTime.isBefore(endTime))
-        {
+        while (currentTime.isBefore(endTime)) {
             times.add(currentTime);
             currentTime = currentTime.plusMinutes(serviceDetail.getDuration());
         }
 
         Set<LocalTime> timeSet = new HashSet<>();
 
-        for(Appointment appointment : appointments){
+        for (Appointment appointment : appointments) {
             LocalTime startTime = appointment.getStartTime();
             endTime = appointment.getEndTime();
-            for(LocalTime time: times){
-                if ((time.isAfter(startTime) || time.equals(startTime)) && time.isBefore(endTime)){
+            for (LocalTime time : times) {
+                if ((time.isAfter(startTime) || time.equals(startTime)) && time.isBefore(endTime)) {
                     timeSet.add(time);
                 }
                 LocalTime time1 = time.plusMinutes(serviceDetail.getDuration());
-                if((time1.isAfter(startTime) || time1.equals(startTime)) && time1.isBefore(endTime)){
+                if ((time1.isAfter(startTime) || time1.equals(startTime)) && time1.isBefore(endTime)) {
                     timeSet.add(time);
                 }
             }
@@ -201,18 +201,60 @@ public class BusinessServiceService {
     }
 
     @Transactional
-    public void addEmployee(String email, String employeeEmail) {
+    public void addEmployee(String email, EmployeeInput employeeInput, Language language) throws GeneralSecurityException {
+
+        //TODO- map BusinessUnit and User
 
         Optional<User> loggedUser = userRepository.findByEmail(email);
 
-        Optional<User> foundUser = userRepository.findByEmail(employeeEmail);
-        if (foundUser.isPresent()) {
-            List<BusinessUsers> businessUsers = loggedUser.get().getBusinessUsers();
-            Business business = businessUsers.size() > 0 ? loggedUser.get().getBusinessUsers().get(0).getBusiness() : null;
-            BusinessUsers businessUsersNew = new BusinessUsers(business, foundUser.get());
-            businessUsersRepository.save(businessUsersNew);
+        User user = saveUser(employeeInput, email);
+        BusinessUsers businessUsers = saveBusinessUser(loggedUser.get(), user);
+        BusinessUnit businessUnit = saveBusinessUnit(businessUsers.getBusiness(), employeeInput, email);
+
+        businessUsers.getBusiness().addBusinessUnit(businessUnit);
+        for (String businessServiceCode : employeeInput.getBusinessServiceCodes()) {
+            Optional<BusinessService> foundBusinessService = businessServiceRepository.findByBusinessServiceCode(businessServiceCode);
+            foundBusinessService.ifPresent(businessService -> businessService.addBusinessUnit(businessUnit));
         }
 
+    }
+
+    private BusinessUnit saveBusinessUnit(Business business, EmployeeInput employeeInput, String email) throws GeneralSecurityException {
+        String businessUnitCode = Crypt.decrypt(employeeInput.getBusinessUnitCode(), ENCRYPTION_KEY.value());
+        Optional<BusinessUnit> foundBusinessUnit = businessUnitRepository.findByBusinessUnitCode(businessUnitCode);
+        if (!foundBusinessUnit.isPresent()) {
+            BusinessUnit businessUnit = new BusinessUnit();
+            businessUnit.setName(employeeInput.getFirstName() + " " + employeeInput.getLastName());
+            businessUnit.setBusiness(business);
+            businessUnit.setBusinessOwnerEmail(email);
+            businessUnit.setBusinessUnitCode(getComplexUUID());
+
+            businessUnitRepository.save(businessUnit);
+        }
+
+        return businessUnitRepository.findByBusinessUnitCode(businessUnitCode).get();
+    }
+
+    private BusinessUsers saveBusinessUser(User loggedUser, User foundUser) {
+        List<BusinessUsers> businessUsers = loggedUser.getBusinessUsers();
+        Business business = businessUsers.size() > 0 ? loggedUser.getBusinessUsers().get(0).getBusiness() : null;
+        BusinessUsers businessUsersNew = new BusinessUsers(business, foundUser);
+        businessUsersRepository.save(businessUsersNew);
+        return businessUsersNew;
+    }
+
+    private User saveUser(EmployeeInput employeeInput, String email) {
+        Optional<User> foundUser = userRepository.findByEmail(employeeInput.getEmail());
+        if (!foundUser.isPresent()) {
+            User user = UserMapper.employeeToUser(employeeInput);
+            String uuid = String.valueOf(UUID.randomUUID());
+            LocalDateTime now = LocalDateTime.now();
+            user.setUserKey(uuid);
+            user.setCreatedDate(now);
+            userRepository.save(user);
+            return user;
+        }
+        return foundUser.get();
     }
 
     @Transactional
@@ -237,10 +279,10 @@ public class BusinessServiceService {
 
 
         BusinessService businessService = this.businessServiceRepository.findByBusinessServiceCode(businessServiceCode)
-                .orElseThrow(  () -> new ApiException(Messages.get("BUSINESS.SERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
+                .orElseThrow(() -> new ApiException(Messages.get("BUSINESS.SERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
                 );
         BusinessUnit businessUnit = this.businessUnitRepository.findByBusinessUnitCode(businessUnitCode)
-                .orElseThrow(  () -> new ApiException(Messages.get("BUSINESS.UNIT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED) );
+                .orElseThrow(() -> new ApiException(Messages.get("BUSINESS.UNIT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED));
 
 
         businessService.addBusinessUnit(businessUnit);

@@ -1,6 +1,7 @@
 package com.api.mapper;
 
 import com.api.entities.User;
+import com.api.input.EmployeeInput;
 import com.api.input.UserInput;
 import com.api.output.UserJSON;
 
@@ -26,5 +27,13 @@ public class UserMapper {
                 .build();
     }
 
+    public static User employeeToUser(EmployeeInput employeeInput) {
+        return User.builder()
+                .firstName(employeeInput.getFirstName())
+                .lastName(employeeInput.getLastName())
+                .email(employeeInput.getEmail())
+                .phone(employeeInput.getPhone())
+                .build();
+    }
 
 }

@@ -39,6 +39,7 @@ public class BusinessUsers {
         this.business = business;
         this.user = user;
         this.BusinessUserId = new BusinessUsersKey(business.getId(),user.getId());
+        this.createdDate = LocalDateTime.now();
     }
 
     @Override
