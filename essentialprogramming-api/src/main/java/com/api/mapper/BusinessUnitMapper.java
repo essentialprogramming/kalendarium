@@ -21,6 +21,7 @@ public class BusinessUnitMapper {
         return BusinessUnitJSON.builder()
                 .name(business.getName())
                 .businessUnitCode(Crypt.encrypt(business.getBusinessUnitCode(), ENCRYPTION_KEY.value()))
+                .businessUnitOwner(business.getBusinessOwnerEmail())
                 .build();
     }
 }

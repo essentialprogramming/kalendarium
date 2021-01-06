@@ -1,6 +1,7 @@
 package com.api.controller;
 
 
+import com.api.entities.User;
 import com.api.input.BusinessServiceInput;
 import com.api.input.BusinessUnitInput;
 import com.api.output.UserJSON;
@@ -75,7 +76,7 @@ public class BusinessUnitController {
     private Serializable create(String email, BusinessUnitInput businessUnitInput, int version) throws ApiException {
         try {
             UserJSON user = userService.loadUser(email, language);
-            businessUnitService.save(email, businessUnitInput, language, version);
+            businessUnitService.save(user.getEmail(),businessUnitInput,language,version);
             return TRUE;
         } catch (ApiException e) {
             LOG.error("An error occurred while saving a new business unit.", e);

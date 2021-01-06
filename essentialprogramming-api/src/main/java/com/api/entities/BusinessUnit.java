@@ -29,6 +29,9 @@ public class BusinessUnit {
     @Column(name = "businessunitcode")
     private String businessUnitCode;
 
+    @Column(name = "businessunitowner")
+    private String businessOwnerEmail;
+
     @Column(name = "name")
     private String name;
 

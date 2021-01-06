@@ -41,6 +41,10 @@ public class UserService {
         this.emailTemplateService = emailTemplateService;
     }
 
+    public UserRepository getUserRepository(){
+        return  userRepository;
+    }
+
     @Transactional
     public UserJSON save(UserInput input, com.util.enums.Language language) throws GeneralSecurityException {
 

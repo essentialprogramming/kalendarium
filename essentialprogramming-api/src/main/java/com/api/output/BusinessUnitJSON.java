@@ -11,5 +11,6 @@ public class BusinessUnitJSON {
 
     private String name;
     private String businessUnitCode;
+    private String businessUnitOwner;
 
 }

@@ -62,6 +62,7 @@ public class BusinessUnitService {
 
         BusinessUnit businessUnit = BusinessUnitMapper.inputToBusinessUnit(businessUnitInput);
         businessUnit.setBusiness(business);
+        businessUnit.setBusinessOwnerEmail(email);
         businessUnit.setBusinessUnitCode(getComplexUUID());
 
         unitRepository.save(businessUnit);
