@@ -21,7 +21,7 @@ public class BusinessService {
     @Column(name = "businessserviceid", nullable = false, unique = true)
     private int id;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "servicedetailid")
     private ServiceDetail serviceDetail;
 
@@ -41,11 +41,14 @@ public class BusinessService {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY )
     @JoinTable(
             name = "businessservicebusinessunit",
             joinColumns = @JoinColumn(name = "businessserviceid"),
             inverseJoinColumns = @JoinColumn(name = "businessunitid"))
     List<BusinessUnit> unitsPerformingService;
 
+    public void addBusinessUnit(BusinessUnit businessUnit) {
+        this.unitsPerformingService.add(businessUnit);
+    }
 }

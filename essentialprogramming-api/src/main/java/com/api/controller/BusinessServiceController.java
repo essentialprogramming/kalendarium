@@ -1,10 +1,9 @@
 package com.api.controller;
 
-import com.api.input.BusinessInput;
 import com.api.input.BusinessServiceInput;
+import com.api.input.BusinessServiceScheduleInput;
 import com.api.input.BusinessServiceUpdateInput;
-import com.api.input.UserInput;
-import com.api.output.UserJSON;
+import com.api.input.BusinessUnitServiceInput;
 import com.api.service.BusinessServiceService;
 import com.api.service.UserService;
 import com.config.spring.ExecutorsProvider;
@@ -23,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
@@ -33,8 +31,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 import static java.lang.Boolean.TRUE;
 
@@ -47,12 +50,51 @@ public class BusinessServiceController {
 
     private final UserService userService;
     private final BusinessServiceService businessServiceService;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("h:mm a");
+
 
     @Autowired
     public BusinessServiceController(BusinessServiceService businessServiceService, UserService userService) {
         this.businessServiceService = businessServiceService;
         this.userService = userService;
     }
+
+    @POST
+    @Path("business-service/schedule")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Create Business Service", tags = {"BusinessService",},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Returns auth key if successfully added.",
+                            content = @Content(mediaType = "application/json"
+                            ))
+            })
+    public void getSchedule(BusinessServiceScheduleInput businessServiceInput, @Suspended AsyncResponse asyncResponse) {
+
+        ExecutorService executorService = ExecutorsProvider.getExecutorService();
+        Computation.computeAsync(() -> getSchedule(businessServiceInput), executorService)
+                .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
+                .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
+    }
+
+
+    private List<String> getSchedule(BusinessServiceScheduleInput businessServiceInput) throws ApiException {
+        try {
+            Set<LocalTime> times = businessServiceService.getSchedule(businessServiceInput, language);
+            List<String> timeFormatted = times.stream()
+                    .map(time -> time.format(FORMATTER))
+                    .collect(Collectors.toList());
+
+            return timeFormatted;
+        } catch (ApiException e) {
+            LOG.error("An error occurred while retrieving business service schedule.", e);
+            throw e;
+        } catch (Exception e) {
+            LOG.error("An error occurred while retrieving business service schedule.", e);
+            throw new ApiException(Messages.get("", language), HTTPCustomStatus.BUSINESS_EXCEPTION);
+        }
+    }
+
 
     @POST
     @Path("business-service/create")
@@ -77,6 +119,37 @@ public class BusinessServiceController {
     private Serializable create(String email, BusinessServiceInput businessServiceInput) throws ApiException {
         try {
             businessServiceService.save(email, businessServiceInput, language);
+            return TRUE;
+        } catch (ApiException e) {
+            LOG.error("An error occurred while saving a new business.", e);
+            throw e;
+        } catch (Exception e) {
+            LOG.error("An error occurred while saving a new business.", e);
+            throw new ApiException(Messages.get("BUSINESS.NOT.STORED", language), HTTPCustomStatus.BUSINESS_EXCEPTION);
+        }
+    }
+
+
+    @POST
+    @Path("business-service/add")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Add Business Unit to Business Service", tags = {"BusinessService",},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "",
+                            content = @Content(mediaType = "application/json"
+                            ))
+            })
+    public void addBusinessUnit(BusinessUnitServiceInput businessServiceInput, @Suspended AsyncResponse asyncResponse) {
+        ExecutorService executorService = ExecutorsProvider.getExecutorService();
+        Computation.computeAsync(() -> addBusinessUnit(businessServiceInput), executorService)
+                .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
+                .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
+    }
+
+    private Serializable addBusinessUnit(BusinessUnitServiceInput businessServiceInput) throws ApiException {
+        try {
+            businessServiceService.addBusinessUnit(businessServiceInput, language);
             return TRUE;
         } catch (ApiException e) {
             LOG.error("An error occurred while saving a new business.", e);

@@ -23,7 +23,7 @@ public class BusinessUnit {
     @JoinColumn(name = "businessid")
     private Business business;
 
-    @OneToMany (mappedBy = "businessUnit", fetch = FetchType.LAZY)
+    @OneToMany (mappedBy = "businessUnit", fetch = FetchType.EAGER)
     private List<Appointment> appointments;
 
     @Column(name = "businessunitcode")

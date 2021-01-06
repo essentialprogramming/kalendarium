@@ -4,7 +4,6 @@ import com.api.entities.enums.Day;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalTime;
 import java.util.List;
 
 @Builder
