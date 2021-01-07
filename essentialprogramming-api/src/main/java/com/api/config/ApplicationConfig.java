@@ -38,8 +38,8 @@ public class ApplicationConfig extends ResourceConfig {
         register(BusinessServiceController.class);
         register(BusinessUnitController.class);
         register(AppointmentController.class);
-        register(CountryController.class);
-        register(WelcomeController.class);
+        //register(CountryController.class);
+        //register(WelcomeController.class);
         register(SecurityFeature.class);
         register(MultiPartFeature.class);
 

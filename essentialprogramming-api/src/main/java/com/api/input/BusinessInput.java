@@ -13,6 +13,8 @@ public class BusinessInput {
 
     private String name;
     private String address;
+    private String latitude;
+    private String longitude;
     private String zip;
     private String city;
     private String phone;

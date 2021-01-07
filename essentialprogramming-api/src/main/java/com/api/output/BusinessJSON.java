@@ -14,6 +14,8 @@ public class BusinessJSON implements Serializable {
     private String name;
     private String businessCode;
     private String address;
+    private String latitude;
+    private String longitude;
     private String zip;
     private String city;
     private String phone;

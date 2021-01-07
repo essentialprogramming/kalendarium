@@ -38,6 +38,12 @@ public class Business {
     @Column(name = "businesscode")
     private String businessCode;
 
+    @Column(name="latitude")
+    private String latitude;
+
+    @Column(name="longitude")
+    private String longitude;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "business")
     private List<BusinessHistory> businessHistories;
     
