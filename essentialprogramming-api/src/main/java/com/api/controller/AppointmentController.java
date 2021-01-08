@@ -85,7 +85,7 @@ public class AppointmentController {
     }
 
     @POST
-    @Path("appointment/updateStatus")
+    @Path("appointment/updateStatus/{appointmentCode}")
     @Consumes("application/json")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Update Status for Appointment", tags = {"Appointment",},
@@ -94,7 +94,7 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json"
                             ))
             })
-    public void updateStatus(String appointmentCode, @Suspended AsyncResponse asyncResponse) throws GeneralSecurityException {
+    public void updateStatus(@PathParam("appointmentCode") String appointmentCode, @Suspended AsyncResponse asyncResponse) throws GeneralSecurityException {
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
         Computation.computeAsync(() -> updateStatus(appointmentCode), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)

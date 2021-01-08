@@ -17,6 +17,14 @@ public enum AppResources {
         }
     },
     /**
+     * Url to be sent in the create account email.
+     */
+    ACCOUNT_PASSWORD_URL {
+        public String value() {
+            return System.getenv().getOrDefault("APP_URL", configuration.getPropertyAsString("app.front.url")) + "/setpassword";
+        }
+    },
+    /**
      * Url to be sent in the confirm appointment email.
      */
     APPOINTMENT_CONFIRMATION_URL {

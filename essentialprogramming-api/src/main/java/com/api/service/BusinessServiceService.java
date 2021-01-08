@@ -8,7 +8,12 @@ import com.api.output.BusinessServiceJSON;
 import com.api.output.UserJSON;
 import com.api.repository.*;
 import com.crypto.Crypt;
+import com.crypto.PasswordHash;
+import com.email.EmailTemplateService;
+import com.email.Template;
+import com.internationalization.EmailMessages;
 import com.internationalization.Messages;
+import com.resources.AppResources;
 import com.util.enums.HTTPCustomStatus;
 import com.util.enums.Language;
 import com.util.exceptions.ApiException;
@@ -40,6 +45,8 @@ public class BusinessServiceService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     private static final Logger LOG = LoggerFactory.getLogger(BusinessServiceService.class);
+    private final EmailTemplateService emailTemplateService;
+
 
 
     @Autowired
@@ -48,13 +55,14 @@ public class BusinessServiceService {
                                   ServiceDetailRepository serviceDetailRepository,
                                   BusinessServiceRepository businessServiceRepository,
                                   BusinessUsersRepository businessUsersRepository,
-                                  BusinessUnitRepository businessUnitRepository) {
+                                  BusinessUnitRepository businessUnitRepository, EmailTemplateService emailTemplateService) {
         this.businessRepository = businessRepository;
         this.userRepository = userRepository;
         this.serviceDetailRepository = serviceDetailRepository;
         this.businessServiceRepository = businessServiceRepository;
         this.businessUsersRepository = businessUsersRepository;
         this.businessUnitRepository = businessUnitRepository;
+        this.emailTemplateService = emailTemplateService;
     }
 
     @Transactional
@@ -207,7 +215,7 @@ public class BusinessServiceService {
 
         Optional<User> loggedUser = userRepository.findByEmail(email);
 
-        User user = saveUser(employeeInput, email);
+        User user = saveUser(employeeInput, email, language);
         BusinessUsers businessUsers = saveBusinessUser(loggedUser.get(), user);
         BusinessUnit businessUnit = saveBusinessUnit(businessUsers.getBusiness(), employeeInput, email);
 
@@ -243,7 +251,7 @@ public class BusinessServiceService {
         return businessUsersNew;
     }
 
-    private User saveUser(EmployeeInput employeeInput, String email) {
+    private User saveUser(EmployeeInput employeeInput, String email, Language language) {
         Optional<User> foundUser = userRepository.findByEmail(employeeInput.getEmail());
         if (!foundUser.isPresent()) {
             User user = UserMapper.employeeToUser(employeeInput);
@@ -252,9 +260,37 @@ public class BusinessServiceService {
             user.setUserKey(uuid);
             user.setCreatedDate(now);
             userRepository.save(user);
+
+
+            // send email for user to set password
+            try {
+                Map<String, Object> templateKeysAndValues = new HashMap<>();
+                String url = AppResources.ACCOUNT_PASSWORD_URL.value() + "?key=" + Crypt.encrypt(user.getUserKey(), ENCRYPTION_KEY.value());
+                templateKeysAndValues.put("fullName", user.getFullName());
+                templateKeysAndValues.put("confirmationLink", url);
+                emailTemplateService.send(templateKeysAndValues, user.getEmail(), EmailMessages.get("create.account.subject", language.getLocale()), Template.CREATE_ACCOUNT, language.getLocale());
+            } catch (GeneralSecurityException e) {
+                throw new ApiException(Messages.get("ENCRYPTION.FAILED", language), HTTPCustomStatus.UNAUTHORIZED);
+            }
+
+
             return user;
         }
         return foundUser.get();
+    }
+
+    @Transactional
+    public void updateEmployeePassword(String userKey, String password, Language language) throws GeneralSecurityException {
+        userKey  = Crypt.decrypt(userKey, ENCRYPTION_KEY.value());
+
+        User user = userRepository.findByUserKey(userKey).orElseThrow(
+                () -> new ApiException(Messages.get("USER.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
+        );
+
+        String hashedPassword = PasswordHash.encode(password);
+
+        user.setPassword(hashedPassword);
+        userRepository.save(user);
     }
 
     @Transactional

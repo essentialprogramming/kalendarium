@@ -7,6 +7,7 @@ public enum Template {
     PARENT_HTML("html/parent"),
 
     NEW_USER("html/new_user", "new_user", PARENT_HTML),
+    CREATE_ACCOUNT("html/create_account", "create_account", PARENT_HTML),
     APPOINTMENT_CONFIRMATION("html/appointment", "appointment", PARENT_HTML),
     ACTIVATE_ACCOUNT("html/activate_account", "activate_account", PARENT_HTML),
     CONFIRM_ACCOUNT("html/confirm_account", "confirm_account", PARENT_HTML),

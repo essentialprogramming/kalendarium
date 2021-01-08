@@ -224,6 +224,29 @@ public class BusinessServiceController {
     }
 
     @POST
+    @Path("business-service/password/{user-key}/{password}")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Set Password for account", tags = {"BusinessService",},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Returns if password was successfully updated.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)))
+            })
+    public void delete(@PathParam("user-key") String userKey, @PathParam("password") String password, @Suspended AsyncResponse asyncResponse) {
+
+        ExecutorService executorService = ExecutorsProvider.getExecutorService();
+        Computation.computeAsync(() -> setPassword(userKey, password), executorService)
+                .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
+                .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
+    }
+
+    private Serializable setPassword(String userKey, String password) throws ApiException, GeneralSecurityException {
+        businessServiceService.updateEmployeePassword(userKey, password, language);
+        return TRUE;
+    }
+
+    @POST
     @Path("business-service/addEmployee")
     @Consumes("application/json")
     @Produces(MediaType.APPLICATION_JSON)
