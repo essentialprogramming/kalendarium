@@ -226,79 +226,17 @@ public class AppointmentService {
     }
 
     @Transactional
-    public AppointmentJSON updateStatus(String email, AppointmentInput appointmentInput, Language language) throws GeneralSecurityException {
-        String businessCode = appointmentInput.getBusinessCode();
-        businessCode  = Crypt.decrypt(businessCode, ENCRYPTION_KEY.value());
+    public AppointmentJSON updateStatus(String appointmentCode, Language language) throws GeneralSecurityException {
+        String code = Crypt.decrypt(appointmentCode, ENCRYPTION_KEY.value());
 
-        Business business = businessRepository.findByBusinessCode(businessCode).orElseThrow(
-                () -> new ApiException(Messages.get("BUSINESS.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
+        Appointment appointment = appointmentRepository.findByAppointmentCode(code).orElseThrow(
+                () -> new ApiException(Messages.get("APPOINTMENT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
         );
 
-        String businessServiceCode = appointmentInput.getBusinessServiceCode();
-        businessServiceCode  = Crypt.decrypt(businessServiceCode, ENCRYPTION_KEY.value());
+        appointment.setStatus(AppointmentStatus.ACCEPTED);
+        appointmentRepository.save(appointment);
 
-        BusinessService businessService = businessServiceRepository.findByBusinessServiceCode(businessServiceCode).orElseThrow(
-                () -> new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
-        );
-
-        String userKey = appointmentInput.getUserKey();
-
-        User user = userRepository.findByUserKey(userKey).orElseThrow(
-                () -> new ApiException(Messages.get("USER.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
-        );
-
-        String businessUnitCode = "";
-        BusinessUnit businessUnit = null;
-
-        Appointment app = AppointmentMapper.inputToAppointment(appointmentInput);
-
-        // if the day/start time/end time do not correspond with the ones in the business service then we can't create the appointment
-        if (!businessService.getServiceDetail().getDay().contains(appointmentInput.getDay()) ||
-                businessService.getServiceDetail().getStartTime().isAfter(app.getStartTime()) ||
-                businessService.getServiceDetail().getEndTime().isBefore(app.getEndTime())) {
-            throw  new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED);
-        }
-
-        businessUnitCode = appointmentInput.getBusinessUnitCode();
-        businessUnitCode = Crypt.decrypt(businessUnitCode, ENCRYPTION_KEY.value());
-
-        businessUnit = businessUnitRepository.findByBusinessUnitCode(businessUnitCode).orElseThrow(
-                () -> new ApiException(Messages.get("BUSINESSUNIT.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED)
-        );
-
-        app.setUser(user);
-        app.setBusiness(business);
-        app.setBusinessUnit(businessUnit);
-        app.setBusinessService(businessService);
-        app.setAppointmentCode(getComplexUUID());
-
-        boolean anotherAppointmentFound = false;
-
-        List<Appointment> appointments = appointmentRepository.findAllByBusinessAndBusinessServiceAndBusinessUnitAndDayAndStartTimeAndEndTime(
-                business,
-                businessService,
-                businessUnit,
-                app.getDay(),
-                app.getStartTime(),
-                app.getEndTime()
-        );
-
-        if (!appointments.isEmpty()) {
-            anotherAppointmentFound = true;
-        }
-
-        if (anotherAppointmentFound) {
-            for (Appointment appointment :
-                appointments) {
-                if (appointment.getUser().equals(user)) {
-                    appointment.setStatus(AppointmentStatus.ACCEPTED);
-                    appointmentRepository.save(appointment);
-                    return AppointmentMapper.appointmentToOutput(appointment);
-                }
-            }
-        }
-
-        return AppointmentMapper.appointmentToOutput(app);
+        return AppointmentMapper.appointmentToOutput(appointment);
     }
 
     @Transactional
@@ -409,7 +347,7 @@ public class AppointmentService {
                 validationKey = Crypt.encrypt(appointment.getUser().getUserKey(), Crypt.encrypt(appointment.getUser().getUserKey(), appointment.getUser().getUserKey()));
                 String encryptedUserKey = Crypt.encrypt(appointment.getUser().getUserKey(), AppResources.ENCRYPTION_KEY.value());
                 Map<String, Object> templateKeysAndValues = new HashMap<>();
-                String url = AppResources.APPOINTMENT_CONFIRMATION_URL.value();
+                String url = AppResources.APPOINTMENT_CONFIRMATION_URL.value() + "?code=" + Crypt.encrypt(appointment.getAppointmentCode(), ENCRYPTION_KEY.value());
                 templateKeysAndValues.put("fullName", appointment.getUser().getFullName());
                 templateKeysAndValues.put("confirmationLink", url);
                 emailTemplateService.send(templateKeysAndValues, appointment.getUser().getEmail(), EmailMessages.get("appointment.subject", language.getLocale()), Template.APPOINTMENT_CONFIRMATION, language.getLocale());

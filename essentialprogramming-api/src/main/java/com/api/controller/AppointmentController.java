@@ -94,27 +94,15 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json"
                             ))
             })
-    public void updateStatus(@HeaderParam("Authorization") String authorization, AppointmentInput appointmentInput, @Suspended AsyncResponse asyncResponse) {
-        final String bearer = AuthUtils.extractBearerToken(authorization);
-        final String email = AuthUtils.getClaim(bearer, "email");
-
+    public void updateStatus(String appointmentCode, @Suspended AsyncResponse asyncResponse) throws GeneralSecurityException {
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
-        Computation.computeAsync(() -> updateStatus(email, appointmentInput), executorService)
+        Computation.computeAsync(() -> updateStatus(appointmentCode), executorService)
                 .thenApplyAsync(json -> asyncResponse.resume(Response.ok(json).build()), executorService)
                 .exceptionally(error -> asyncResponse.resume(ExceptionHandler.handleException((CompletionException) error)));
     }
 
-    private Serializable updateStatus(String email, AppointmentInput appointmentInput) throws ApiException {
-        try {
-            UserJSON user = userService.loadUser(email, language);
-            return appointmentService.updateStatus(email, appointmentInput, language);
-        } catch (ApiException e) {
-            LOG.error("An error occurred while saving a new appointment.", e);
-            throw e;
-        } catch (Exception e) {
-            LOG.error("An error occurred while saving a new appointment.", e);
-            throw new ApiException(Messages.get("APPOINTMENT.NOT.STORED", language), HTTPCustomStatus.BUSINESS_EXCEPTION);
-        }
+    private Serializable updateStatus(String appointmentCode) throws GeneralSecurityException {
+        return appointmentService.updateStatus(appointmentCode, language);
     }
 
     @GET

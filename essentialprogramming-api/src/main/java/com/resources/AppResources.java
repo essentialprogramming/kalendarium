@@ -21,7 +21,7 @@ public enum AppResources {
      */
     APPOINTMENT_CONFIRMATION_URL {
         public String value() {
-            return System.getenv().getOrDefault("APP_URL", configuration.getPropertyAsString("app.front.url")) + "/user/reservationlist";
+            return System.getenv().getOrDefault("APP_URL", configuration.getPropertyAsString("app.front.url")) + "/user/confirm";
         }
     },
     /**
