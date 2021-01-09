@@ -17,5 +17,4 @@ public class EmployeeInput {
     private String lastName;
     private String phone;
     private List<String> businessServiceCodes;
-    private String businessUnitCode;
 }

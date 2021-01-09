@@ -33,7 +33,8 @@ create table if not exists public."businessunit"(
   businessunitid smallint NOT NULL GENERATED ALWAYS AS IDENTITY primary key,
   businessid smallint DEFAULT NULL,
   businessunitowner varchar(100) ,
-  name varchar(100)
+  name varchar(100),
+  userid smallint DEFAULT NULL
 );
 
 

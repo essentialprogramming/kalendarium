@@ -35,6 +35,10 @@ public class BusinessUnit {
     @Column(name = "name")
     private String name;
 
+    @OneToOne
+    @JoinColumn(name = "userid")
+    private User user;
+
     @ManyToMany
     @JoinTable(
             name = "businessservicebusinessunit",
