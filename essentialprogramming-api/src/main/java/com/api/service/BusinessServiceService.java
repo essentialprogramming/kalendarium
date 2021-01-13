@@ -211,13 +211,11 @@ public class BusinessServiceService {
     @Transactional
     public void addEmployee(String email, EmployeeInput employeeInput, Language language) throws GeneralSecurityException {
 
-        //TODO- map BusinessUnit and User
-
         Optional<User> loggedUser = userRepository.findByEmail(email);
 
         User user = saveUser(employeeInput, email, language);
         BusinessUsers businessUsers = saveBusinessUser(loggedUser.get(), user);
-        BusinessUnit businessUnit = saveBusinessUnit(businessUsers.getBusiness(), employeeInput, email);
+        BusinessUnit businessUnit = saveBusinessUnit(businessUsers.getBusiness(), employeeInput, email, user);
 
         businessUsers.getBusiness().addBusinessUnit(businessUnit);
         for (String businessServiceCode : employeeInput.getBusinessServiceCodes()) {
@@ -227,20 +225,18 @@ public class BusinessServiceService {
 
     }
 
-    private BusinessUnit saveBusinessUnit(Business business, EmployeeInput employeeInput, String email) throws GeneralSecurityException {
-        String businessUnitCode = Crypt.decrypt(employeeInput.getBusinessUnitCode(), ENCRYPTION_KEY.value());
-        Optional<BusinessUnit> foundBusinessUnit = businessUnitRepository.findByBusinessUnitCode(businessUnitCode);
+    private BusinessUnit saveBusinessUnit(Business business, EmployeeInput employeeInput, String email, User user) throws GeneralSecurityException {
+        Optional<BusinessUnit> foundBusinessUnit = businessUnitRepository.findByUser(user);
         if (!foundBusinessUnit.isPresent()) {
             BusinessUnit businessUnit = new BusinessUnit();
             businessUnit.setName(employeeInput.getFirstName() + " " + employeeInput.getLastName());
             businessUnit.setBusiness(business);
             businessUnit.setBusinessOwnerEmail(email);
             businessUnit.setBusinessUnitCode(getComplexUUID());
-
+            businessUnit.setUser(user);
             businessUnitRepository.save(businessUnit);
         }
-
-        return businessUnitRepository.findByBusinessUnitCode(businessUnitCode).get();
+        return businessUnitRepository.findByUser(user).get();
     }
 
     private BusinessUsers saveBusinessUser(User loggedUser, User foundUser) {
