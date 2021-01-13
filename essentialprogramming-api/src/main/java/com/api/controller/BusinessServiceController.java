@@ -233,7 +233,7 @@ public class BusinessServiceController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)))
             })
-    public void delete(@PathParam("user-key") String userKey, @PathParam("password") String password, @Suspended AsyncResponse asyncResponse) {
+    public void updatePassword(@PathParam("user-key") String userKey, @PathParam("password") String password, @Suspended AsyncResponse asyncResponse) {
 
         ExecutorService executorService = ExecutorsProvider.getExecutorService();
         Computation.computeAsync(() -> setPassword(userKey, password), executorService)

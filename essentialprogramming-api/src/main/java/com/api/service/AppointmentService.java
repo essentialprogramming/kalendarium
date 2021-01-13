@@ -85,10 +85,15 @@ public class AppointmentService {
 
         Appointment app = AppointmentMapper.inputToAppointment(appointmentInput);
 
-        // if the day/start time/end time do not correspond with the ones in the business service then we can't create the appointment
-        if (!businessService.getServiceDetail().getDay().contains(appointmentInput.getDay()) ||
-                businessService.getServiceDetail().getStartTime().isAfter(app.getStartTime()) ||
-                businessService.getServiceDetail().getEndTime().isBefore(app.getEndTime())) {
+//        // if the day/start time/end time do not correspond with the ones in the business service then we can't create the appointment
+//        if (!businessService.getServiceDetail().getDay().contains(appointmentInput.getDay()) ||
+//                businessService.getServiceDetail().getStartTime().isAfter(app.getStartTime()) ||
+//                businessService.getServiceDetail().getEndTime().isBefore(app.getEndTime())) {
+//            throw  new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED);
+//        }
+
+        // if the day does not correspond with the ones in the business service then we can't create the appointment
+        if (!businessService.getServiceDetail().getDay().contains(appointmentInput.getDay())) {
             throw  new ApiException(Messages.get("BUSINESSSERVICE.NOT.EXIST", language), HTTPCustomStatus.UNAUTHORIZED);
         }
 
