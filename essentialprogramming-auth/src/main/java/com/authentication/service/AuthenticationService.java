@@ -72,7 +72,7 @@ public class AuthenticationService {
 
 
         Map<String, String> privateClaimMap =
-                privateClaims(account.getEmail(), account.isActive(), null);
+                privateClaims(account.getEmail(), account.isActive(), account.getRoles());
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expirationTime = now.plus(1, ChronoUnit.DAYS);

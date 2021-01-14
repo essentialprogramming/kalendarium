@@ -20,6 +20,7 @@ public class UserInput {
     private String phone;
     private String password;
     private String confirmPassword;
+    private String[] roles;
 
 
 }

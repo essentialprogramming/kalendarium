@@ -5,6 +5,8 @@ import com.api.input.EmployeeInput;
 import com.api.input.UserInput;
 import com.api.output.UserJSON;
 
+import java.util.Arrays;
+
 
 public class UserMapper {
 
@@ -14,6 +16,7 @@ public class UserMapper {
                 .lastName(input.getLastName())
                 .email(input.getEmail())
                 .phone(input.getPhone())
+                .roles(Arrays.asList(input.getRoles()))
                 .build();
     }
 

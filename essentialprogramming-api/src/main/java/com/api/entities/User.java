@@ -1,9 +1,11 @@
 package com.api.entities;
 
+import com.util.jpa.StringListConverter;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,7 +75,9 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Subscription> subscriptions;
 
-
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "roles")
+    private List<String> roles = new ArrayList<>();
 
     public String getFullName() {
         return Optional.ofNullable(firstName).orElse("") + " " + Optional.ofNullable(lastName).orElse("");
