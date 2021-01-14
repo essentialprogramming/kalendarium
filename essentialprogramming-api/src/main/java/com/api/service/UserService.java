@@ -77,7 +77,7 @@ public class UserService {
         user.setLastName(input.getLastName());
         user.setPhone(input.getPhone());
         user.setModifiedDate(LocalDateTime.now());
-
+        user.setRoles(Arrays.asList(input.getRoles()));
         User result = userRepository.save(user);
         user.setCreatedBy(result.getId());
 
