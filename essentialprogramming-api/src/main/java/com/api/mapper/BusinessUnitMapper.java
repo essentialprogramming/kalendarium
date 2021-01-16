@@ -1,11 +1,13 @@
 package com.api.mapper;
 
+import com.api.entities.BusinessService;
 import com.api.entities.BusinessUnit;
 import com.api.input.BusinessUnitInput;
 import com.api.output.BusinessUnitJSON;
 import com.crypto.Crypt;
 
 import java.security.GeneralSecurityException;
+import java.util.stream.Collectors;
 
 import static com.resources.AppResources.ENCRYPTION_KEY;
 
@@ -22,6 +24,7 @@ public class BusinessUnitMapper {
                 .name(business.getName())
                 .businessUnitCode(Crypt.encrypt(business.getBusinessUnitCode(), ENCRYPTION_KEY.value()))
                 .businessUnitOwner(business.getBusinessOwnerEmail())
+                .services(business.getServicesPerformedByUnit().stream().map(BusinessService::getName).collect(Collectors.toList()))
                 .build();
     }
 }
