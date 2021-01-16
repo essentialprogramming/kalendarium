@@ -13,7 +13,7 @@ public enum AppResources {
      */
     ACCOUNT_CONFIRMATION_URL {
         public String value() {
-            return System.getenv().getOrDefault("APP_URL", configuration.getPropertyAsString("app.url")) + "/confirm";
+            return System.getenv().getOrDefault("APP_URL", configuration.getPropertyAsString("app.url")) + "/confirmed";
         }
     },
     /**
